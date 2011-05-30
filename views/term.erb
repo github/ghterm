@@ -1,3 +1,13 @@
-Hello There, <%= @user.name %>!<br/>
-
-Token: <%= @user.token %>
+<html>
+<head>
+  <title>GitHub Terminal</title>
+  <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_min.js"></script>
+  <script language="JavaScript" type="text/javascript" src="js/terminal.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+  Hello There, <%= @user.name %>!<br/>
+  Token: <%= @user.token %>
+  <div id="termDiv" class="termopen"></div>
+</body>
+</html>

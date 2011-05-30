@@ -1,0 +1,44 @@
+body { background: #444; }
+
+.term {
+  font-family: "Courier New",courier,fixed,monospace;
+  font-size: 15px;
+  color: #6f8;
+  background: #000;
+  letter-spacing: 1px;
+}
+.term .termReverse {
+  color: #fff;
+  background: #999;
+}
+#termDiv { 
+  margin:0 auto;
+}
+
+.button {
+    padding: 5px 10px;
+    display: inline;
+    background: #777 url(button.png) repeat-x bottom;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    text-shadow: 1px 1px #666;
+    }
+.button:hover {
+    background-position: 0 -48px;
+    }
+.button:active {
+    background-position: 0 top;
+    position: relative;
+    top: 1px;
+    padding: 6px 10px 4px;
+    }
+.button.blue { background-color: #2c6da0; }
+.button.large { font-size: 125%; padding: 7px 12px; }
+.button.large:hover { background-position: 0 -35px; }
+.button.large:active { padding: 8px 12px 6px; background-position: 0 top; }
+

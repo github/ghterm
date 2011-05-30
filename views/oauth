@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>SoundCloud OAuth 2 User Agent Authentication Flow Demo</title>
+    <script type="text/javascript" charset="utf-8" src="js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      $(function () {
+        var extractToken = function(hash) {
+          var match = hash.match(/access_token=(\w+)/);
+          return !!match && match[1];
+        };
+
+        var extractToken = function(hash) {
+          var match = hash.match(/access_token=(\w+)/);
+          return !!match && match[1];
+        };
+
+        var setting =
+          {
+            'host':     "github.dev"
+            , 'clientId': "cff2fb0ed6b06387990f"
+          };
+
+        var authHost     = "http://"     + setting.host;
+        var resourceHost = "http://api." + setting.host;
+
+        var endUserAuthorizationEndpoint = authHost + "/login/oauth/authorize";
+
+        var token = extractToken(document.location.hash);
+        if (token) {
+          $('div.authenticated').show();
+
+          $('span.token').text(token);
+
+          $.ajax({
+              url: resourceHost + '/me'
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', "OAuth " + token);
+                xhr.setRequestHeader('Accept',        "application/json");
+              }
+            , success: function (response) {
+                var container = $('span.user');
+                if (response) {
+                  container.text(response.username);
+                } else {
+                  container.text("An error occurred.");
+                }
+              }
+          });
+        } else {
+          $('div.authenticate').show();
+
+          var authUrl = endUserAuthorizationEndpoint + 
+            "?response_type=token" +
+            "&client_id="    + setting.clientId +
+            "&redirect_uri=" + window.location;
+
+          $("a.connect").attr("href", authUrl);
+        }
+      });
+    </script>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="authenticate hidden">
+      <a class="connect" href="">Connect</a>
+    </div>
+
+    <div class="authenticated hidden">
+      <p>
+        You are using token
+        <span class="token">[no token]</span>.
+      </p>
+
+      <p>
+        Your SoundCloud username is
+        <span class="user">[no username]</span>.
+      </p>
+    </div>
+  </body>
+</html>
+
