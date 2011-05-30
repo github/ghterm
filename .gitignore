@@ -1,0 +1,7 @@
+coverage
+.bundle
+pkg
+.DS_Store
+Gemfile.lock
+tmp
+.powrc
