@@ -1,13 +1,32 @@
 <html>
 <head>
   <title>GitHub Terminal</title>
+  <script language="JavaScript" type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_min.js"></script>
+  <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_parser_min.js"></script>
+  <script language="JavaScript" type="text/javascript" src="js/github.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/terminal.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="css/reset.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="css/text.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="css/960.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
 </head>
 <body>
-  <%= @user.name %> (<%= @user.login %>)<br/>
-  <input id="token" type="hidden" value="<%= @user.token %>">
-  <div id="termDiv" class="termopen"></div>
+  <div class="container_12">
+    <input id="token" type="hidden" value="<%= @user.token %>">
+    <input id="login" type="hidden" value="<%= @user.login %>">
+    <div class="grid_9">
+      <center>
+        <div id="termDiv" class="termopen"></div>
+      </center>
+    </div> 
+    <div class="grid_3">
+      <div id="sidebar">
+        <%= @user.name %> (<%= @user.login %>)<br/>
+        <div id="message"></div>
+        <a href="/logout">logout</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

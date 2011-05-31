@@ -2,7 +2,7 @@ body { background: #444; }
 
 .term {
   font-family: "Courier New",courier,fixed,monospace;
-  font-size: 15px;
+  font-size: 14px;
   color: #6f8;
   background: #000;
   letter-spacing: 1px;
@@ -13,6 +13,13 @@ body { background: #444; }
 }
 #termDiv { 
   margin:0 auto;
+}
+#sidebar {
+  background: #aaa;
+}
+#message {
+  background: #ddd;
+  padding: 10px;
 }
 
 .button {
