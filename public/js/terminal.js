@@ -105,7 +105,7 @@ function listCurrent() {
       term.write("commit : " + data.sha + '%n')
       term.write("tree   : " + data.tree + '%n')
       term.write("author : " + data.author.name + '%n')
-      term.write("date   : " + data.author.date + '%n')
+      term.write("date   : %c(@indianred)" + data.author.date + '%n')
       term.write('%n')
       ghTree = ghRepo.tree(data.tree)
       ghTree.show(function(resp) {
@@ -114,10 +114,13 @@ function listCurrent() {
         data.tree.forEach(function(entry) { 
           if(entry.type == 'tree') {
             color = '@lightskyblue'
+            writePadded(color, entry.path, 68)
           } else {
             color = '@lemonchiffon'
+            writePadded(color, entry.path, 57)
+            color = '@lightcyan'
+            writePadded(color, entry.size + '', 10)
           }
-          writePadded(color, entry.path, 68)
           term.write(entry.sha.substring(0, 10) + "%n")
         })
         nextTerm()
@@ -188,7 +191,6 @@ function popState() {
     term.write("%c(@indianred)ERR: at the top")
     return false
   }
-  term.write("%c(@dimgray)popping " + stateStack.length)
   stateStack.pop()
   arr = stateStack[stateStack.length - 1]
   state = arr[0]
