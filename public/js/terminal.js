@@ -39,6 +39,8 @@ function termHandler() {
   } else if (command == 'cd') {
     var newState = this.argv[this.argc++];
     changeState(newState)
+  } else if (command == 'log') {
+    runLog(this.argv)
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -48,8 +50,8 @@ function changeState(newState) {
   if(currentState == 'top') { // top level - cd'ing to a repo state
     for(i = 0; i <= ghRepos.length - 1; i++) {
       if(ghRepos[i].name == newState) {
-        ghRepo = ghRepos[i]
-        setPs(ghRepo.name)
+        ghRepo = gh.repo(ghUser.username, ghRepos[i].name)
+        setPs(ghRepos[i].name)
         currentState = 'repo'
         return nextTerm()
       }
@@ -63,6 +65,16 @@ function changeState(newState) {
   nextTerm("unknown state: " + newState)
 }
 
+function runLog(log) {
+  if(currentState == 'branch') {
+    // show commits
+  } else {
+    nextTerm("ERR: you must cd to the branch of a repo first")
+  }
+}
+
+var ghBranches = null
+
 // write a listing of the current state
 function listCurrent() {
   if(currentState == 'top') {
@@ -71,7 +83,13 @@ function listCurrent() {
       $("#message").text("Number of repos: " + ghRepos.length)
       writeRepos()
     });
-  } else if(currentState == 'repos') {
+  } else if(currentState == 'repo') {
+    // TODO: list branches
+    ghRepo.branches(function (data) {
+      ghBranches = data.data
+      $("#message").text("Number of branches: " + ghBranches.length)
+      writeBranches()
+    })
   } else {
     term.write("unknown state")
     nextTerm()
@@ -86,20 +104,23 @@ function nextTerm(line) {
   term.prompt()
 }
 
+// list branches
+function writeBranches() {
+  ghBranches.forEach(function (branch) {
+    name = branch.ref.replace('refs/heads/', '')
+    term.write("%c(@lightyellow)" + name)
+    term.newLine()
+  })
+  nextTerm()
+}
+
+// list repositories
 function writeRepos() {
-  listed = 0
-  // list repositories
-  for(i = 0; i <= ghRepos.length - 1; i++) {
-    if(listed > 2) {
-      term.newLine()
-      listed = 0
-    }
-    name = ghRepos[i].name
-    writePadded("%c(@lightblue)", name, 25)
-    listed += 1
-  }
-  term.newLine();
-  term.prompt();
+  ghRepos.forEach(function (repo) {
+    term.write("%c(@lightblue)" + repo.name)
+    term.newLine()
+  })
+  nextTerm()
 }
 
 
@@ -137,6 +158,8 @@ var ghUser  = null
 var ghLogin = null
 var ghRepos = null
 var ghRepo  = null
+var ghBranches = null
+var ghBranch   = null
 var currentState = 'top'
 
 $(function() {

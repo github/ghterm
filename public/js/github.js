@@ -458,6 +458,13 @@
         return this;
     };
 
+
+    gh.repo.prototype.branches = withV3Api(function (callback, context) {
+        jsonp("repos/" + this.user + "/" + this.repo + "/git/refs/heads", callback, context);
+        return this;
+    });
+
+
     // ### Commits
 
     gh.commit = function (user, repo, sha) {
@@ -751,5 +758,6 @@
     };
 
     //TODO: Creating a Pull Request
+
 
 }(window));
