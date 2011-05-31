@@ -349,14 +349,6 @@
         return this;
     };
 
-    // Get all branches in this repo.
-    gh.repo.prototype.branches = function (callback, context) {
-        jsonp("repos/show/" + this.user + "/" + this.repo + "/branches",
-              callback,
-              context);
-        return this;
-    };
-
     // Gather line count information on the language(s) used in this repo.
     gh.repo.prototype.languages = function (callback, context) {
         jsonp("/repos/show/" + this.user + "/" + this.repo + "/languages",
@@ -458,12 +450,19 @@
         return this;
     };
 
+    gh.repo.prototype.commit = function (sha) {
+        return gh.commit(this.user, this.repo, sha)
+    };
+
+    gh.repo.prototype.tree = function (sha) {
+        return gh.tree(this.user, this.repo, sha)
+    };
+
 
     gh.repo.prototype.branches = withV3Api(function (callback, context) {
         jsonp("repos/" + this.user + "/" + this.repo + "/git/refs/heads", callback, context);
         return this;
     });
-
 
     // ### Commits
 
@@ -475,28 +474,28 @@
         this.sha = sha;
     };
 
-    gh.commit.prototype.show = function (callback, context) {
-        jsonp("commits/show/" + this.user + "/" + this.repo + "/" + this.sha,
-              callback,
-              context);
+    gh.commit.prototype.show = withV3Api(function (callback, context) {
+        jsonp("repos/" + this.user + "/" + this.repo + "/git/commits/" + this.sha, 
+          callback, context);
         return this;
+    });
+
+    // ### Trees
+
+    gh.tree = function (user, repo, sha) {
+        if ( !(this instanceof gh.tree) )
+            return new gh.tree(user, repo, sha);
+        this.user = user;
+        this.repo = repo;
+        this.sha = sha;
     };
 
-    // Get a list of all commits on a repos branch.
-    gh.commit.forBranch = function (user, repo, branch, callback, context) {
-        jsonp("commits/list/" + user + "/" + repo + "/" + branch,
-              callback,
-              context);
+    gh.tree.prototype.show = withV3Api(function (callback, context) {
+        jsonp("repos/" + this.user + "/" + this.repo + "/git/trees/" + this.sha, 
+          callback, context);
         return this;
-    };
+    });
 
-    // Get a list of all commits on this path (file or dir).
-    gh.commit.forPath = function (user, repo, branch, path, callback, context) {
-        jsonp("commits/list/" + user + "/" + repo + "/" + branch + "/" + path,
-              callback,
-              context);
-        return this;
-    };
 
     // ### Issues
 

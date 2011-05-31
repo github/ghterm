@@ -82,6 +82,9 @@ function runLog(log) {
   }
 }
 
+var ghCommit
+var ghShow
+
 // write a listing of the current state
 function listCurrent() {
   if(currentState == 'top') {
@@ -97,8 +100,30 @@ function listCurrent() {
       writeBranches()
     })
   } else if(currentState == 'branch') {
-    term.write("unknown branch")
-    nextTerm()
+    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.sha)
+    ghCommit.show(function(resp) {
+      data = resp.data
+      ghCommit.cache = data
+      term.write("commit : " + data.sha + '%n')
+      term.write("tree   : " + data.tree + '%n')
+      term.write("author : " + data.author.name + '%n')
+      term.write('%n')
+      ghTree = ghRepo.tree(data.tree)
+      ghTree.show(function(resp) {
+        data = resp.data
+        ghCommit.treecache = data
+        data.tree.forEach(function(entry) { 
+          if(entry.type == 'tree') {
+            color = '@lightskyblue'
+          } else {
+            color = '@lemonchiffon'
+          }
+          writePadded(color, entry.path, 68)
+          term.write(entry.sha.substring(0, 10) + "%n")
+        })
+        nextTerm()
+      })
+    })
   } else {
     term.write("unknown state")
     nextTerm()
@@ -140,6 +165,9 @@ function writeRepos() {
 function writePadded(color, str, len) {
   if (str.length > len) {
     str = str.substring(0, len - 2) + '..'
+  }
+  if(color) {
+    color = "%c(" + color + ")"
   }
   term.write(color + str + " ")
   rest = len - str.length
