@@ -6,8 +6,8 @@
   <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <body>
-  Hello There, <%= @user.name %>!<br/>
-  Token: <%= @user.token %>
+  <%= @user.name %> (<%= @user.login %>)<br/>
+  <input id="token" type="hidden" value="<%= @user.token %>">
   <div id="termDiv" class="termopen"></div>
 </body>
 </html>
