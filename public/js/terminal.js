@@ -47,20 +47,29 @@ function termHandler() {
 }
 
 function changeState(newState) {
+  if (newState == '..') {
+    popState()
+    return nextTerm()
+  }
   if(currentState == 'top') { // top level - cd'ing to a repo state
     for(i = 0; i <= ghRepos.length - 1; i++) {
       if(ghRepos[i].name == newState) {
         ghRepo = gh.repo(ghUser.username, ghRepos[i].name)
-        setPs(ghRepos[i].name)
-        currentState = 'repo'
+        pushState('repo', ghRepo.repo)
         return nextTerm()
       }
     }
   } else if (currentState == 'repo') {
-    if (newState == '..') {
-      currentState = 'top'
-      return nextTerm()
+    for(i = 0; i <= ghBranches.length - 1; i++) {
+      var name = ghBranches[i].ref.replace('refs/heads/', '')
+      if(name == newState) {
+        ghBranch = ghBranches[i]
+        pushState('branch', name)
+        return nextTerm()
+      }
     }
+  } else if (currentState == 'branch') {
+    // TODO: cd to a file path
   }
   nextTerm("unknown state: " + newState)
 }
@@ -73,8 +82,6 @@ function runLog(log) {
   }
 }
 
-var ghBranches = null
-
 // write a listing of the current state
 function listCurrent() {
   if(currentState == 'top') {
@@ -84,12 +91,14 @@ function listCurrent() {
       writeRepos()
     });
   } else if(currentState == 'repo') {
-    // TODO: list branches
     ghRepo.branches(function (data) {
       ghBranches = data.data
       $("#message").text("Number of branches: " + ghBranches.length)
       writeBranches()
     })
+  } else if(currentState == 'branch') {
+    term.write("unknown branch")
+    nextTerm()
   } else {
     term.write("unknown state")
     nextTerm()
@@ -106,6 +115,8 @@ function nextTerm(line) {
 
 // list branches
 function writeBranches() {
+  if(!ghBranches)
+    return false
   ghBranches.forEach(function (branch) {
     name = branch.ref.replace('refs/heads/', '')
     term.write("%c(@lightyellow)" + name)
@@ -116,6 +127,8 @@ function writeBranches() {
 
 // list repositories
 function writeRepos() {
+  if(!ghRepos)
+    return false
   ghRepos.forEach(function (repo) {
     term.write("%c(@lightblue)" + repo.name)
     term.newLine()
@@ -135,6 +148,22 @@ function writePadded(color, str, len) {
   }
 }
 
+function pushState(state, desc) {
+  stateStack.push([state, desc])
+  currentState = state
+  setPs(desc + "[" + state + "]")
+}
+
+function popState() {
+  if(stateStack.length < 1)
+    return false
+  arr = stateStack.pop()
+  state = arr[0]
+  desc = arr[1]
+  currentState = state
+  setPs(desc + "[" + state + "]")
+}
+
 function setPs(str) {
   term.ps = str.substr(0, 20) + ' $'
 }
@@ -150,7 +179,7 @@ function startTerminal() {
       handler: termHandler
     }
   )
-  setPs(ghLogin)
+  pushState('top', ghLogin)
   term.open()
 }
 
@@ -161,6 +190,7 @@ var ghRepo  = null
 var ghBranches = null
 var ghBranch   = null
 var currentState = 'top'
+var stateStack = []
 
 $(function() {
 
