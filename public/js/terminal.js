@@ -46,7 +46,7 @@ function termHandler() {
     runLog(this.argv)
   } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
     var fileName = this.argv[this.argc++];
-    startEditor(fileName, commmand)
+    startEditor(fileName, command)
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -137,7 +137,7 @@ function listCurrent() {
   } else if(currentState == 'path') {
     // use data from ghPath to get a tree sha from treecache
     showCommit()
-    sha = findTreeSha(getCurrentDir())
+    sha = findTreeSha(getCurrentDir(), true)
     showTree(sha, currentPath())
   } else {
     term.write("unknown state")
@@ -150,8 +150,8 @@ function getCurrentDir() {
   return tmpPath.pop()
 }
 
-function findTreeSha(path) {
-  var subtree = getCurrentSubtree(true)
+function findTreeSha(path, pop) {
+  var subtree = getCurrentSubtree(pop)
   for(i = 0; i <= subtree.count - 1; i++) {
     var tree = subtree.tree[i]
     if(tree.path == path) {
@@ -279,7 +279,7 @@ function resetPs(str) {
 }
 
 function startEditor(fileName, type) {
-  if(sha = findTreeSha(fileName)) {
+  if(sha = findTreeSha(fileName, false)) {
     var blob = ghRepo.blob(sha)
     blob.show(function(resp) {
       b = resp.data
@@ -306,6 +306,7 @@ function startEditor(fileName, type) {
     nextTerm("%c(@indianred)" + fileName + " is not a file in this context")
   }
 }
+
 function stopEditor() {
   $("#editor").hide()
   $("#termDiv").show()
