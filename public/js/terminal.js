@@ -45,10 +45,7 @@ function termHandler() {
   } else if (command == 'log') {
     runLog(this.argv)
   } else if (command == 'edit') {
-    term.close()
-    $("#termDiv").hide()
-    $("#editor").show()
-    editor = ace.edit("editorDiv");
+    startEditor()
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -96,6 +93,7 @@ function changeState(newState) {
 function runLog(log) {
   if(currentState == 'branch' || currentState == 'path') {
     // show commits
+    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.sha)
     ghCommit.list(function(resp) {
       commits = resp.data
       commits.forEach(function(commit) {
@@ -105,7 +103,6 @@ function runLog(log) {
         writePadded("@wheat", commit.message.split("\n").pop(), 50)
         term.newLine()
       })
-      console.log(resp)
       nextTerm()
     })
   } else {
@@ -272,7 +269,28 @@ function popState() {
 }
 
 function setPs(str) {
-  term.ps = str.substr(0, 20) + ' $'
+  lastPs = str.substr(0, 20) + ' $'
+  term.ps = lastPs
+}
+
+function resetPs(str) {
+  term.ps = lastPs
+}
+
+function startEditor() {
+  term.close()
+  $("#termDiv").hide()
+  $("#editor").show()
+  $("#editorDiv").text("Some awesome text")
+  editor = ace.edit("editorDiv");
+}
+function stopEditor() {
+  $("#editor").hide()
+  $("#termDiv").show()
+  term.open()
+  term.write("File saved")
+  resetPs()
+  term.prompt()
 }
 
 // Open the Terminal
@@ -302,16 +320,13 @@ var ghPath = []
 
 var currentState = 'top'
 var stateStack = []
+var lastPs = null
 
 var editor = null
 
 $(function() {
   $("#editDone").click(function() {
-    $("#editor").hide()
-    $("#termDiv").show()
-    term.open()
-    term.write("File saved")
-    term.prompt()
+    stopEditor()
   })
 
   token = $("#token").attr("value")
