@@ -44,12 +44,30 @@ function termHandler() {
     })
   } else if (command == 'log') {
     runLog(this.argv)
+  } else if (command == 'status') {
+    runStatus()
   } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
     var fileName = this.argv[this.argc++];
     startEditor(fileName, command)
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
+}
+
+function runStatus() {
+  if(ghStage.length > 0) {
+    term.write("Base Commit: %c(@indianred)" + ghStageCommit + "%n")
+    // TODO: check ghCommit sha matches, else the commit will fail
+    ghStage.forEach(function(entry) {
+      writePadded('@lightblue', 'M', 2)
+      writePadded('@lightyellow', entry.sha.substring(0, 10), 10)
+      writePadded('@cornflowerblue', entry.path, 50)
+      term.newLine()
+    })
+  } else {
+    term.write("Nothing modified")
+  }
+  nextTerm()
 }
 
 function changeState(newState) {
@@ -73,6 +91,11 @@ function changeState(newState) {
       var name = ghBranches[i].ref.replace('refs/heads/', '')
       if(name == newState) {
         ghBranch = ghBranches[i]
+        if(ghBranch.sha != ghStageCommit) {
+          term.write("%c(@indianred)New Stage%n")
+          ghStageCommit = ghBranch.sha
+          ghStage = []
+        }
         pushState('branch', name)
         return nextTerm()
       }
@@ -174,8 +197,8 @@ function currentPath() {
 
 function showCommit() {
   data = ghCommit.cache
-  term.write("commit : " + data.sha + '%n')
-  term.write("tree   : " + data.tree + '%n')
+  term.write("commit : %c(@lightyellow)" + data.sha + '%n')
+  term.write("tree   : %c(@lightyellow)" + data.tree + '%n')
   term.write("author : " + data.author.name + '%n')
   term.write("date   : %c(@indianred)" + data.author.date + '%n')
   term.write("path   : " + currentPath() + '%n')
@@ -280,6 +303,7 @@ function resetPs(str) {
 
 function startEditor(fileName, type) {
   if(sha = findTreeSha(fileName, false)) {
+    lastEditPath = currentPath() + fileName
     var blob = ghRepo.blob(sha)
     blob.show(function(resp) {
       b = resp.data
@@ -313,11 +337,10 @@ function stopEditor() {
   $("#termDiv").show()
 
   content = editor.getSession().getValue()
-  console.log(content)
   var blob = ghRepo.blob(sha)
   blob.write(content, function(resp) {
-    console.log(resp)
-    term.write("File saved (" + resp['sha'] + ")")
+    ghStage.push({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha})
+    term.write("File '" + lastEditPath + "' saved %c(@lightyellow)(" + resp['sha'] + ")")
     term.prompt()
   })
 
@@ -349,7 +372,10 @@ var ghRepo  = null
 var ghBranches = null
 var ghBranch   = null
 var ghCommit = null
+var ghStage = []
+var ghStageCommit = null
 var ghPath = []
+var lastEditPath = ''
 
 var currentState = 'top'
 var stateStack = []
