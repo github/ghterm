@@ -44,9 +44,9 @@ function termHandler() {
     })
   } else if (command == 'log') {
     runLog(this.argv)
-  } else if (command == 'edit') {
+  } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
     var fileName = this.argv[this.argc++];
-    startEditor(fileName)
+    startEditor(fileName, commmand)
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -278,7 +278,7 @@ function resetPs(str) {
   term.ps = lastPs
 }
 
-function startEditor(fileName) {
+function startEditor(fileName, type) {
   if(sha = findTreeSha(fileName)) {
     var blob = ghRepo.blob(sha)
     blob.show(function(resp) {
@@ -291,6 +291,14 @@ function startEditor(fileName) {
         $("#editor").show()
         $("#editorDiv").text(content)
         editor = ace.edit("editorDiv")
+        if(type == 'vim') {
+          vim = require("ace/keyboard/keybinding/vim").Vim;
+          editor.setKeyboardHandler(vim)
+        }
+        if(type == 'emacs') {
+          emacs = require("ace/keyboard/keybinding/emacs").Emacs;
+          editor.setKeyboardHandler(emacs)
+        }
       }
       nextTerm()
     })
