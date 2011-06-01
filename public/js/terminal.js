@@ -45,7 +45,8 @@ function termHandler() {
   } else if (command == 'log') {
     runLog(this.argv)
   } else if (command == 'edit') {
-    startEditor()
+    var fileName = this.argv[this.argc++];
+    startEditor(fileName)
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -277,12 +278,24 @@ function resetPs(str) {
   term.ps = lastPs
 }
 
-function startEditor() {
-  term.close()
-  $("#termDiv").hide()
-  $("#editor").show()
-  $("#editorDiv").text("Some awesome text")
-  editor = ace.edit("editorDiv");
+function startEditor(fileName) {
+  if(sha = findTreeSha(fileName)) {
+    var blob = ghRepo.blob(sha)
+    blob.show(function(resp) {
+      b = resp.data
+      if (b.content) {
+        content = blob.decode(b.content)
+        term.close()
+        $("#termDiv").hide()
+        $("#editor").show()
+        $("#editorDiv").text(content)
+        editor = ace.edit("editorDiv")
+      }
+      nextTerm()
+    })
+  } else {
+    nextTerm("%c(@indianred)" + fileName + " is not a file in this context")
+  }
 }
 function stopEditor() {
   $("#editor").hide()
