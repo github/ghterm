@@ -289,8 +289,9 @@ function startEditor(fileName, type) {
         TermGlobals.keylock = true
         $("#termDiv").hide()
         $("#editor").show()
-        $("#editorDiv").text(content)
         editor = ace.edit("editorDiv")
+        editor.getSession().setValue(content)
+        editor.gotoLine(1)
         if(type == 'vim') {
           vim = require("ace/keyboard/keybinding/vim").Vim;
           editor.setKeyboardHandler(vim)
@@ -310,11 +311,19 @@ function startEditor(fileName, type) {
 function stopEditor() {
   $("#editor").hide()
   $("#termDiv").show()
+
+  content = editor.getSession().getValue()
+  console.log(content)
+  var blob = ghRepo.blob(sha)
+  blob.write(content, function(resp) {
+    console.log(resp)
+    term.write("File saved (" + resp['sha'] + ")")
+    term.prompt()
+  })
+
   TermGlobals.keylock = false
   term.open()
-  term.write("File saved")
   resetPs()
-  term.prompt()
 }
 
 // Open the Terminal

@@ -48,38 +48,10 @@
         document.getElementsByTagName('head')[0].appendChild(script);
     },
 
-    // Send an HTTP POST. Unfortunately, it isn't possible to support a callback
-    // with the resulting data. (Please prove me wrong if you can!)
-    //
-    // This is implemented with a hack to get around the cross-domain
-    // restrictions on ajax calls. Basically, a form is created that will POST
-    // to the GitHub API URL, stuck inside an iframe so that it won't redirect
-    // this page, and then submitted.
-    post = function (url, vals) {
-        var
-        form = document.createElement("form"),
-        iframe = document.createElement("iframe"),
-        doc = iframe.contentDocument !== undefined ?
-            iframe.contentDocument :
-            iframe.contentWindow.document,
-        key, field;
-        vals = vals || {};
-
-        form.setAttribute("method", "post");
-        form.setAttribute("action", apiRoot + url);
-        for (key in vals) {
-            if (vals.hasOwnProperty(key)) {
-                field = document.createElement("input");
-                field.type = "hidden";
-                field.value = encodeURIComponent(vals[key]);
-                form.appendChild(field);
-            }
-        }
-
-        iframe.setAttribute("style", "display: none;");
-        doc.body.appendChild(form);
-        document.body.appendChild(iframe);
-        form.submit();
+    // post to sinatra proxy so this is do-able, freaking cross-site grr
+    postp = function (url, vals, callback) {
+      vals['proxy_url'] = url
+      $.post('/proxy', vals, callback, 'json')
     },
 
     // This helper function will throw a TypeError if the library user is not
@@ -309,10 +281,18 @@
     };
 
     gh.blob.prototype.show = withV3Api(function (callback, context) {
-        jsonp("repos/" + this.user + "/" + this.repo + "/git/blobs/" + this.sha, 
-          callback, context);
-        return this;
+      jsonp("repos/" + this.user + "/" + this.repo + "/git/blobs/" + this.sha, 
+        callback, context);
+      return this;
     });
+
+    gh.blob.prototype.write = function (content, callback) {
+      var vals = {}
+      vals['content'] = content
+      url = "repos/" + this.user + "/" + this.repo + "/git/blobs"
+      postp(url, vals, callback)
+      return this;
+    };
 
     gh.blob.prototype.decode = function (data) {
       return Base64.decode(data)

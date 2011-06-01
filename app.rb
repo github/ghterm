@@ -1,5 +1,7 @@
 require 'sinatra'
 require 'sinatra_auth_github'
+require 'rest_client'
+require 'pp'
 
 class TerminalApp < Sinatra::Base
   enable :sessions
@@ -32,6 +34,17 @@ class TerminalApp < Sinatra::Base
   get '/auth' do
     authenticate!
     redirect '/term'
+  end
+
+  post '/proxy' do
+    host = 'http://api.github.dev'
+    url = host + '/' + params.delete('proxy_url')
+    params['access_token'] = github_user.token
+
+    resp = RestClient.post url, params, :content_type => :json, :accept => :json
+
+    content_type :json
+    resp
   end
 
   get '/logout' do
