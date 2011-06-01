@@ -286,6 +286,7 @@ function startEditor(fileName) {
       if (b.content) {
         content = blob.decode(b.content)
         term.close()
+        TermGlobals.keylock = true
         $("#termDiv").hide()
         $("#editor").show()
         $("#editorDiv").text(content)
@@ -300,6 +301,7 @@ function startEditor(fileName) {
 function stopEditor() {
   $("#editor").hide()
   $("#termDiv").show()
+  TermGlobals.keylock = false
   term.open()
   term.write("File saved")
   resetPs()
