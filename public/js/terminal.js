@@ -22,6 +22,7 @@ function termInitHandler() {
   this.prompt();
 }
 
+
 function termHandler() {
   var parser = new Parser();
   parser.parseLine(this);
@@ -43,6 +44,11 @@ function termHandler() {
     })
   } else if (command == 'log') {
     runLog(this.argv)
+  } else if (command == 'edit') {
+    term.close()
+    $("#termDiv").hide()
+    $("#editor").show()
+    editor = ace.edit("editorDiv");
   } else {
     nextTerm(command + " not a command. type 'help' for commands")
   }
@@ -268,6 +274,7 @@ function popState() {
 function setPs(str) {
   term.ps = str.substr(0, 20) + ' $'
 }
+
 // Open the Terminal
 
 function startTerminal() {
@@ -296,7 +303,16 @@ var ghPath = []
 var currentState = 'top'
 var stateStack = []
 
+var editor = null
+
 $(function() {
+  $("#editDone").click(function() {
+    $("#editor").hide()
+    $("#termDiv").show()
+    term.open()
+    term.write("File saved")
+    term.prompt()
+  })
 
   token = $("#token").attr("value")
   ghLogin = $("#login").attr("value")
@@ -304,6 +320,5 @@ $(function() {
   ghUser = gh.user(ghLogin);
 
   startTerminal()
-
 })
 

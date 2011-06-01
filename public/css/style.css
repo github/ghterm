@@ -21,6 +21,16 @@ body { background: #444; }
   background: #ddd;
   padding: 10px;
 }
+#editor {
+  background: #fff;
+  display: none;
+}
+#editorDiv {
+  position: relative;
+  width: 700px;
+  height: 500px;
+  background: #fff;
+}
 
 .button {
     padding: 5px 10px;
@@ -48,4 +58,3 @@ body { background: #444; }
 .button.large { font-size: 125%; padding: 7px 12px; }
 .button.large:hover { background-position: 0 -35px; }
 .button.large:active { padding: 8px 12px 6px; background-position: 0 top; }
-

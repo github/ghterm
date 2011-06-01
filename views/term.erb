@@ -6,6 +6,7 @@
   <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_parser_min.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/github.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/terminal.js"></script>
+  <script language="JavaScript" type="text/javascript" src="js/ace/ace.js"></script>
   <link rel="stylesheet" type="text/css" media="all" href="css/reset.css" />
   <link rel="stylesheet" type="text/css" media="all" href="css/text.css" />
   <link rel="stylesheet" type="text/css" media="all" href="css/960.css" />
@@ -19,12 +20,17 @@
       <center>
         <div id="termDiv" class="termopen"></div>
       </center>
+      <div id="editor">
+        <div id="editorDiv">some text</div>
+        <a href="#" class="button blue" id="editDone">Save and Close</a>
+      </div>
     </div> 
     <div class="grid_3">
       <div id="sidebar">
         <%= @user.name %> (<%= @user.login %>)<br/>
         <div id="message"></div>
         <a href="/logout">logout</a>
+
       </div>
     </div>
   </div>
