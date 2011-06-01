@@ -1,6 +1,4 @@
-// ## Client-side Javascript API wrapper for GitHub
-//
-// Tries to map one-to-one with the GitHub API V2, but in a Javascripty manner.
+// ## Client-side Javascript API wrapper for GitHub (mostly v3)
 
 (function (globals) {
 
@@ -162,66 +160,6 @@
         return this;
     };
 
-    // Update a user's info. You must be authenticated as this user for this to
-    // succeed.
-    //
-    //     TODO: example
-    gh.user.prototype.update = function (params) {
-        authRequired(this.username);
-        var key, postData = {
-            access_token: authToken
-        };
-        for (key in params) {
-            if (params.hasOwnProperty(key)) {
-                postData["values["+key+"]"] = encodeURIComponent(params[key]);
-            }
-        }
-        post("user/show/" + this.username, postData);
-        return this;
-    };
-
-    // Get a list of who this user is following.
-    //
-    //     TODO: example
-    gh.user.prototype.following = function (callback, context) {
-        jsonp("user/show/" + this.username + "/following", callback, context);
-    };
-
-    // Find out what other users are following this user.
-    //
-    //     TODO: example
-    gh.user.prototype.followers = function (callback, context) {
-        jsonp("user/show/" + this.username + "/followers", callback, context);
-    };
-
-    // Make this user follow some other user. You must be authenticated as this
-    // user for this to succeed.
-    //
-    //     TODO: example
-    gh.user.prototype.follow = function (user) {
-        authRequired.call(this);
-        post("user/follow/" + user);
-        return this;
-    };
-
-    // Make this user quit following the given `user`. You must be authenticated
-    // as this user to succeed.
-    //
-    //     TODO: example
-    gh.user.prototype.unfollow = function (user) {
-        authRequired.call(this);
-        post("user/unfollow/" + user);
-        return this;
-    };
-
-    // Get a list of repositories that this user is watching.
-    //
-    //     TODO: example
-    gh.user.prototype.watching = function (callback, context) {
-        jsonp("repos/watched/" + this.username, callback, context);
-        return this;
-    };
-
     // Get a list of this user's repositories, 30 per page
     //
     //     gh.user("fitzgen").repos(function (data) {
@@ -263,38 +201,14 @@
         return this;
     };
 
-    // Make this user fork the repo that lives at
-    // http://github.com/user/repo. You must be authenticated as this user for
-    // this to succeed.
-    //
-    //     gh.user("fitzgen").forkRepo("brianleroux", "wtfjs");
-    gh.user.prototype.forkRepo = function (user, repo) {
-        authRequired(this.username);
-        post("repos/fork/" + user + "/" + repo);
-        return this;
-    };
-
     // Get a list of all repos that this user can push to (including ones that
     // they are just a collaborator on, and do not own). Must be authenticated
     // as this user.
     gh.user.prototype.pushable = function (callback, context) {
-        authRequired(authUsername);
+        authRequired(this.user);
         jsonp("repos/pushable", callback, context);
     };
 
-    gh.user.prototype.publicGists = withTempApiRoot(
-        "http://gist.github.com/api/v1/json/gists/",
-        function (callback, context) {
-            jsonp(this.username, callback, context);
-            return this;
-        }
-    );
-
-    // Search users for `query`.
-    gh.user.search = function (query, callback, context) {
-        jsonp("user/search/" + query, callback, context);
-        return this;
-    };
 
     // ### Repositories
 
@@ -319,134 +233,12 @@
         return this;
     };
 
-    // Update the information for this repo. Must be authenticated as the
-    // repository owner. Params can include:
-    //
-    //   * description
-    //   * homepage
-    //   * has_wiki
-    //   * has_issues
-    //   * has_downloads
-    gh.repo.prototype.update = function (params) {
-        authRequired(this.user);
-        var key, postData = {
-            access_token: authToken
-        };
-        for (key in params) {
-            if (params.hasOwnProperty(key)) {
-                postData["values["+key+"]"] = encodeURIComponent(params[key]);
-            }
-        }
-        post("repos/show/" + this.user + "/" + this.repo, postData);
-        return this;
-    };
-
-    // Get all tags for this repo.
-    gh.repo.prototype.tags = function (callback, context) {
-        jsonp("repos/show/" + this.user + "/" + this.repo + "/tags",
-              callback,
-              context);
-        return this;
-    };
-
-    // Gather line count information on the language(s) used in this repo.
-    gh.repo.prototype.languages = function (callback, context) {
-        jsonp("/repos/show/" + this.user + "/" + this.repo + "/languages",
-              callback,
-              context);
-        return this;
-    };
-
-    // Gather data on all the forks of this repo.
-    gh.repo.prototype.network = function (callback, context) {
-        jsonp("repos/show/" + this.user + "/" + this.repo + "/network",
-              callback,
-              context);
-        return this;
-    };
-
-    // All users who have contributed to this repo. Pass `true` to showAnon if you
-    // want to see the non-github contributors.
-    gh.repo.prototype.contributors = function (callback, context, showAnon) {
-        var url = "repos/show/" + this.user + "/" + this.repo + "/contributors";
-        if (showAnon)
-            url += "/anon";
-        jsonp(url,
-              callback,
-              context);
-        return this;
-    };
-
-    // Get all of the collaborators for this repo.
-    gh.repo.prototype.collaborators = function (callback, context) {
-        jsonp("repos/show/" + this.user + "/" + this.repo + "/collaborators",
-              callback,
-              context);
-        return this;
-    };
-
-    // Add a collaborator to this project. Must be authenticated.
-    gh.repo.prototype.addCollaborator = function (collaborator) {
-        authRequired(this.user);
-        post("repos/collaborators/" + this.repo + "/add/" + collaborator);
-        return this;
-    };
-
-    // Remove a collaborator from this project. Must be authenticated.
-    gh.repo.prototype.removeCollaborator = function (collaborator) {
-        authRequired(this.user);
-        post("repos/collaborators/" + this.repo + "/remove/" + collaborator);
-        return this;
-    };
-
-    // Make this repository private. Authentication required.
-    gh.repo.prototype.setPrivate = function () {
-        authRequired(this.user);
-        post("repo/set/private/" + this.repo);
-        return this;
-    };
-
-    // Make this repository public. Authentication required.
-    gh.repo.prototype.setPublic = function () {
-        authRequired(this.user);
-        post("repo/set/public/" + this.repo);
-        return this;
-    };
-
-    // Search for repositories. `opts` may include `start_page` or `language`,
-    // which must be capitalized.
-    gh.repo.search = function (query, opts, callback, context) {
-        var url = "repos/search/" + query.replace(" ", "+");
-        if (typeof opts === "function") {
-            opts = {};
-            callback = arguments[1];
-            context = arguments[2];
-        }
-        url += "?" + paramify(opts);
-        return this;
-    };
-
     // Get all the repos that are owned by `user`.
     gh.repo.forUser = function (user, callback, context, page) {
         if (!page)
           page = 1;
 
         jsonp("repos/show/" + user + '?page=' + page, callback, context);
-        return this;
-    };
-
-    // Create a repository. Must be authenticated.
-    gh.repo.create = function (name, opts) {
-        authRequired(authUsername);
-        opts.name = name;
-        post("repos/create", opts);
-        return this;
-    };
-
-    // Delete a repository. Must be authenticated.
-    gh.repo.del = function (name) {
-        authRequired(authUsername);
-        post("repos/delete/" + name);
         return this;
     };
 
