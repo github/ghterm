@@ -38,7 +38,9 @@ function termHandler() {
     listCurrent(this)
   } else if (command == 'cd') {
     var newState = this.argv[this.argc++];
-    changeState(newState)
+    newState.split("/").forEach(function(dir) {
+      changeState(dir)
+    })
   } else if (command == 'log') {
     runLog(this.argv)
   } else {
@@ -72,8 +74,7 @@ function changeState(newState) {
       }
     }
   } else if ((currentState == 'branch') || (currentState == 'path')) {
-    var subtree = getCurrentSubtree()
-    console.log(subtree)
+    var subtree = getCurrentSubtree(false)
     for(i = 0; i <= subtree.count - 1; i++) {
       var name = subtree.tree[i].path;
       if(name == newState) {
@@ -87,8 +88,20 @@ function changeState(newState) {
 }
 
 function runLog(log) {
-  if(currentState == 'branch') {
+  if(currentState == 'branch' || currentState == 'path') {
     // show commits
+    ghCommit.list(function(resp) {
+      commits = resp.data
+      commits.forEach(function(commit) {
+        writePadded("@green",  commit.sha.substring(0, 8), 8)
+        writePadded("@cornflowerblue",   commit.author.date.substring(5, 10), 5)
+        writePadded("@lightblue",   commit.author.email, 10)
+        writePadded("@wheat", commit.message.split("\n").pop(), 50)
+        term.newLine()
+      })
+      console.log(resp)
+      nextTerm()
+    })
   } else {
     nextTerm("ERR: you must cd to the branch of a repo first")
   }
@@ -134,9 +147,7 @@ function getCurrentDir() {
 }
 
 function findTreeSha(path) {
-  var subtree = getCurrentSubtree()
-  console.log("FindTreeSha:" + path)
-  console.log(subtree)
+  var subtree = getCurrentSubtree(true)
   for(i = 0; i <= subtree.count - 1; i++) {
     var tree = subtree.tree[i]
     if(tree.path == path) {
@@ -145,12 +156,11 @@ function findTreeSha(path) {
   }
 }
 
-function getCurrentSubtree() {
+function getCurrentSubtree(pop) {
   var tmpPath = ghPath.slice()
-  path = tmpPath.pop()
-  relPath = tmpPath.join('/')
-  if(relPath == '')
-    relPath = '/'
+  if(pop)
+    path = tmpPath.pop()
+  relPath = '/' + tmpPath.join('/')
   return ghCommit.subTree[relPath]
 }
 
@@ -169,8 +179,6 @@ function showCommit() {
 }
 
 function showTree(sha, path) {
-  console.log(path)
-  console.log(sha)
   var tree = ghRepo.tree(sha)
   tree.show(function(resp) {
     data = resp.data
