@@ -48,6 +48,9 @@ function termHandler() {
 
 function changeState(newState) {
   if (newState == '..') {
+    if(currentState == 'path') {
+      ghPath.pop()
+    }
     popState()
     return nextTerm()
   }
@@ -68,8 +71,17 @@ function changeState(newState) {
         return nextTerm()
       }
     }
-  } else if (currentState == 'branch') {
-    // TODO: cd to a file path
+  } else if ((currentState == 'branch') || (currentState == 'path')) {
+    var subtree = getCurrentSubtree()
+    console.log(subtree)
+    for(i = 0; i <= subtree.count - 1; i++) {
+      var name = subtree.tree[i].path;
+      if(name == newState) {
+        ghPath.push(name)
+        pushState('path', name)
+        return nextTerm()
+      }
+    }
   }
   nextTerm("unknown state: " + newState)
 }
@@ -81,7 +93,6 @@ function runLog(log) {
     nextTerm("ERR: you must cd to the branch of a repo first")
   }
 }
-
 
 // write a listing of the current state
 function listCurrent() {
@@ -102,37 +113,84 @@ function listCurrent() {
     ghCommit.show(function(resp) {
       data = resp.data
       ghCommit.cache = data
-      term.write("commit : " + data.sha + '%n')
-      term.write("tree   : " + data.tree + '%n')
-      term.write("author : " + data.author.name + '%n')
-      term.write("date   : %c(@indianred)" + data.author.date + '%n')
-      term.write('%n')
-      ghTree = ghRepo.tree(data.tree)
-      ghTree.show(function(resp) {
-        data = resp.data
-        ghCommit.treecache = data
-        data.tree.forEach(function(entry) { 
-          if(entry.type == 'tree') {
-            color = '@lightskyblue'
-            writePadded(color, entry.path, 68)
-          } else {
-            color = '@lemonchiffon'
-            writePadded(color, entry.path, 57)
-            color = '@lightcyan'
-            writePadded(color, entry.size + '', 10)
-          }
-          term.write(entry.sha.substring(0, 10) + "%n")
-        })
-        nextTerm()
-      })
+      showCommit()
+      ghCommit.subTree = {}
+      showTree(data.tree, '/')
     })
-  } else if(currentState == 'subtree') {
-
+  } else if(currentState == 'path') {
+    // use data from ghPath to get a tree sha from treecache
+    showCommit()
+    sha = findTreeSha(getCurrentDir())
+    showTree(sha, currentPath())
   } else {
     term.write("unknown state")
     nextTerm()
   }
 }
+
+function getCurrentDir() {
+  var tmpPath = ghPath.slice()
+  return tmpPath.pop()
+}
+
+function findTreeSha(path) {
+  var subtree = getCurrentSubtree()
+  console.log("FindTreeSha:" + path)
+  console.log(subtree)
+  for(i = 0; i <= subtree.count - 1; i++) {
+    var tree = subtree.tree[i]
+    if(tree.path == path) {
+      return tree.sha
+    }
+  }
+}
+
+function getCurrentSubtree() {
+  var tmpPath = ghPath.slice()
+  path = tmpPath.pop()
+  relPath = tmpPath.join('/')
+  if(relPath == '')
+    relPath = '/'
+  return ghCommit.subTree[relPath]
+}
+
+function currentPath() {
+  return "/" + ghPath.join('/')
+}
+
+function showCommit() {
+  data = ghCommit.cache
+  term.write("commit : " + data.sha + '%n')
+  term.write("tree   : " + data.tree + '%n')
+  term.write("author : " + data.author.name + '%n')
+  term.write("date   : %c(@indianred)" + data.author.date + '%n')
+  term.write("path   : " + currentPath() + '%n')
+  term.write('%n')
+}
+
+function showTree(sha, path) {
+  console.log(path)
+  console.log(sha)
+  var tree = ghRepo.tree(sha)
+  tree.show(function(resp) {
+    data = resp.data
+    ghCommit.subTree[path] = data
+    data.tree.forEach(function(entry) { 
+      if(entry.type == 'tree') {
+        color = '@lightskyblue'
+        writePadded(color, entry.path, 68)
+      } else {
+        color = '@lemonchiffon'
+        writePadded(color, entry.path, 57)
+        color = '@lightcyan'
+        writePadded(color, entry.size + '', 10)
+      }
+      term.write(entry.sha.substring(0, 10) + "%n")
+    })
+    nextTerm()
+  })
+}
+
 
 function nextTerm(line) {
   if(line){
@@ -225,6 +283,8 @@ var ghRepo  = null
 var ghBranches = null
 var ghBranch   = null
 var ghCommit = null
+var ghPath = []
+
 var currentState = 'top'
 var stateStack = []
 
