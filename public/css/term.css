@@ -9,8 +9,8 @@
   color: #fff;
   background: #999;
 }
-#termDiv { 
-  margin:0 auto;
+#termDiv > table { 
+  border: 1px solid #aaa;
 }
 #editor {
   background: #fff;

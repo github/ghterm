@@ -46,6 +46,8 @@ function termHandler() {
     runLog(this.argv)
   } else if (command == 'status') {
     runStatus()
+  } else if (command == 'commit') {
+    runCommit()
   } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
     var fileName = this.argv[this.argc++];
     startEditor(fileName, command)
@@ -56,7 +58,7 @@ function termHandler() {
 
 function runStatus() {
   if(ghStage.length > 0) {
-    term.write("Base Commit: %c(@indianred)" + ghStageCommit + "%n")
+    term.write("Parent Commit: %c(@indianred)" + ghStageCommit + "%n")
     // TODO: check ghCommit sha matches, else the commit will fail
     ghStage.forEach(function(entry) {
       writePadded('@lightblue', 'M', 2)
@@ -67,6 +69,11 @@ function runStatus() {
   } else {
     term.write("Nothing modified")
   }
+  nextTerm()
+}
+
+function runCommit() {
+  term.write("Commit")
   nextTerm()
 }
 
