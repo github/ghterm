@@ -129,10 +129,10 @@
     //    gh.user("fitzgen").show(function (data) {
     //        console.log(data.user);
     //    });
-    gh.user.prototype.show = function (callback, context) {
-        jsonp("user/show/" + this.username, callback, context);
+    gh.user.prototype.show = withV3Api(function (callback, context) {
+        jsonp("users/" + this.username, callback, context);
         return this;
-    };
+    });
 
     // Get a list of this user's repositories, 30 per page
     //

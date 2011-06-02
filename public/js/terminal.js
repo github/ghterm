@@ -52,7 +52,7 @@ function termHandler() {
   } else if (command == 'ls') {
     listCurrent()
   } else if (command == 'cd') {
-    var newState = this.argv[this.argc++];
+    newState = this.argv[this.argc++];
     newState.split("/").forEach(function(dir) {
       changeState(dir)
     })
@@ -63,7 +63,8 @@ function termHandler() {
   } else if (command == 'test') {
     runTest()
   } else if (command == 'commit') {
-    runCommit()
+    var message = this.argv.slice(1, this.argv.length).join(' ')
+    runCommit(message)
   } else if (command == 'unstage') {
     var path = this.argv[this.argc++];
     runUnstage(path)
@@ -83,7 +84,7 @@ function runTest() {
   commandStack.push("listCurrent()")
   commandStack.push("changeState('github')")
   commandStack.push("listCurrent()")
-  commandStack.push("changeState('master')")
+  commandStack.push("changeState('dagnav')")
   commandStack.push("listCurrent()")
   commandStack.push("startEditor('config.ru')")
   commandStack.push("editor.getSession().setValue('hey new content')")
@@ -104,6 +105,13 @@ function runNext() {
 }
 // -- sets up env for feature dev --
 
+var pollTimer = 30000
+function checkUser() {
+  ghUser.show(function(resp) {
+    $('#avatar').html("<img src='" + resp.data.avatar_url + "'>")
+    setTimeout("checkUser()", pollTimer)
+  })
+}
 
 function runUnstage(path) {
   if(ghStage.length > 0) {
@@ -123,7 +131,6 @@ function runUnstage(path) {
 function runStatus() {
   if(ghStage.length > 0) {
     term.write("Parent Commit: %c(@indianred)" + ghStageCommit + "%n")
-    // TODO: check ghCommit sha matches, else the commit will fail
     ghStage.forEach(function(entry) {
       writePadded('@lightblue', 'M', 2)
       writePadded('@lightyellow', entry.sha.substring(0, 10), 10)
@@ -136,13 +143,16 @@ function runStatus() {
   nextTerm()
 }
 
-function runCommit() {
+function runCommit(message) {
 
   if(ghStage.length <= 0) {
     return nextTerm("Nothing staged for commit%n")
   }
   if(ghStageCommit != ghCommit.sha) {
     return nextTerm("Stage commit is mismatched%n")
+  }
+  if(message.length <= 0) {
+    return nextTerm("Please provide a commit message%n")
   }
 
   term.write("Base Tree:                   %c(@khaki)" + ghCommit.cache.tree + '%n')
@@ -154,7 +164,7 @@ function runCommit() {
   tree.write(tr, function(resp) {
     cm = {}
     cm.tree = resp.sha
-    cm.message = "test message"
+    cm.message = message
     cm.parents = [ghStageCommit]
     addNewObject('tree', resp)
     term.write(" tree %c(@lightyellow)" + resp.sha + "%n")
@@ -168,6 +178,9 @@ function runCommit() {
       ref.update(resp.sha, function(resp) {
         nextTerm("           %c(@lightblue)Branch Updated")
         ghBranch.sha = resp.sha
+        ghStage = []
+        ghStageCommit = resp.sha
+        ghCommit = ghRepo.commit(ghBranch.sha)
       })
     })
   })
@@ -526,6 +539,7 @@ $(function() {
   ghUser = gh.user(ghLogin)
   gh.authenticate(token)
 
+  checkUser()
   startTerminal()
 })
 
