@@ -3,9 +3,20 @@ var term;
 var help = [
   '%+r github terminal help %-r',
   '',
-  ' * type "ls"            to see your context.',
-  ' * type "cd <dir>"      to change your context.',
-  ' * type "help"          to see this page.',
+  '= Navigating =============================================',
+  '',
+  '  ls              %c(@tan)see your context.',
+  '  cd <dir>        %c(@tan)change your context.',
+  '',
+  '= Editing and Committing =================================',
+  '',
+  '  log             %c(@tan)view a commit log when in a branch',
+  '  edit <file>     %c(@tan)edit a file, which is staged after the edit',
+  '  status          %c(@tan)see which files are staged for the next commit',
+  '  unstage <file>  %c(@tan)remove a change from your staging area',
+  '  commit <msg>    %c(@tan)commit your staged changes to the current branch',
+  '',
+  '  help            %c(@tan)to see this page.',
   ' '
 ];
 
@@ -34,7 +45,10 @@ function termHandler() {
     // blank line
   } else if (command == 'help') {
     this.clear()
-    nextTerm(help)
+    help.forEach(function(line) {
+      term.write(line + '%n')
+    })
+    nextTerm()
   } else if (command == 'ls') {
     listCurrent()
   } else if (command == 'cd') {
