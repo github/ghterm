@@ -36,7 +36,7 @@ function termHandler() {
     this.clear()
     nextTerm(help)
   } else if (command == 'ls') {
-    listCurrent(this)
+    listCurrent()
   } else if (command == 'cd') {
     var newState = this.argv[this.argc++];
     newState.split("/").forEach(function(dir) {
@@ -46,6 +46,8 @@ function termHandler() {
     runLog(this.argv)
   } else if (command == 'status') {
     runStatus()
+  } else if (command == 'test') {
+    runTest()
   } else if (command == 'commit') {
     runCommit()
   } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
@@ -55,6 +57,36 @@ function termHandler() {
     nextTerm(command + " not a command. type 'help' for commands")
   }
 }
+
+// sets up env for feature dev
+var commandStack = []
+var commandTimer = 500
+function runTest() {
+  commandStack = []
+  commandStack.push("listCurrent()")
+  commandStack.push("changeState('github')")
+  commandStack.push("listCurrent()")
+  commandStack.push("changeState('master')")
+  commandStack.push("listCurrent()")
+  commandStack.push("startEditor('config.ru')")
+  commandStack.push("editor.getSession().setValue('hey new content')")
+  commandStack.push("stopEditor()")
+  commandStack.push("changeState('config')")
+  commandStack.push("listCurrent()")
+  commandStack.push("startEditor('shotgun.rb')")
+  commandStack.push("editor.getSession().setValue('hey more new content')")
+  commandStack.push("stopEditor()")
+  commandStack.push("changeState('..')")
+  setTimeout("runNext()", commandTimer)
+}
+function runNext() {
+  if(cmd = commandStack.shift()) {
+    eval(cmd)
+    setTimeout("runNext()", commandTimer)
+  }
+}
+// -- sets up env for feature dev --
+
 
 function runStatus() {
   if(ghStage.length > 0) {
@@ -73,8 +105,38 @@ function runStatus() {
 }
 
 function runCommit() {
-  term.write("Commit")
-  nextTerm()
+
+  if(ghStage.length <= 0) {
+    return nextTerm("Nothing staged for commit%n")
+  }
+  if(ghStageCommit != ghCommit.sha) {
+    return nextTerm("Stage commit is mismatched%n")
+  }
+
+  term.write("Base Tree:                   %c(@khaki)" + ghCommit.cache.tree + '%n')
+  tr = {}
+  tr.base_tree = ghCommit.cache.tree
+  tr.tree = ghStage
+  term.write("Writing the new tree...")
+  var tree = ghRepo.tree()
+  tree.write(tr, function(resp) {
+    cm = {}
+    cm.tree = resp.sha
+    cm.message = "test message"
+    cm.parents = [ghStageCommit]
+    term.write(" tree %c(@lightyellow)" + resp.sha + "%n")
+    term.write("Committing files...  ")
+    var commit = ghRepo.commit()
+    commit.write(cm, function(resp) {
+      term.write(" commit %c(@lightyellow)" + resp.sha + "%n")
+      term.write("Updating branch...")
+      var ref = ghRepo.ref(ghBranch.ref, ghBranch.sha)
+      ref.update(resp.sha, function(resp) {
+        nextTerm("           %c(@lightblue)Branch Updated")
+        ghBranch.sha = resp.sha
+      })
+    })
+  })
 }
 
 function changeState(newState) {
@@ -202,6 +264,14 @@ function currentPath() {
   return "/" + ghPath.join('/')
 }
 
+function treePath() {
+  if(ghPath.length > 0) {
+    return ghPath.join('/') + '/'
+  } else {
+    return ''
+  }
+}
+
 function showCommit() {
   data = ghCommit.cache
   term.write("commit : %c(@lightyellow)" + data.sha + '%n')
@@ -310,7 +380,7 @@ function resetPs(str) {
 
 function startEditor(fileName, type) {
   if(sha = findTreeSha(fileName, false)) {
-    lastEditPath = currentPath() + fileName
+    lastEditPath = treePath() + fileName
     var blob = ghRepo.blob(sha)
     blob.show(function(resp) {
       b = resp.data
@@ -344,9 +414,9 @@ function stopEditor() {
   $("#termDiv").show()
 
   content = editor.getSession().getValue()
-  var blob = ghRepo.blob(sha)
+  var blob = ghRepo.blob()
   blob.write(content, function(resp) {
-    ghStage.push({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha})
+    ghStage.push({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha, 'mode': '100644'})
     term.write("File '" + lastEditPath + "' saved %c(@lightyellow)(" + resp['sha'] + ")")
     term.prompt()
   })

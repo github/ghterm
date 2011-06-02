@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'sinatra_auth_github'
-require 'rest_client'
+require 'nestful'
 require 'pp'
 
 class TerminalApp < Sinatra::Base
@@ -39,9 +39,10 @@ class TerminalApp < Sinatra::Base
   post '/proxy' do
     host = 'http://api.github.dev'
     url = host + '/' + params.delete('proxy_url')
-    params['access_token'] = github_user.token
+    p = JSON.parse(Base64.decode64(params['datap']))
+    p['access_token'] = github_user.token
 
-    resp = RestClient.post url, params, :content_type => :json, :accept => :json
+    resp = Nestful.post url, :params => p
 
     content_type :json
     resp

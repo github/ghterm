@@ -50,8 +50,10 @@
 
     // post to sinatra proxy so this is do-able, freaking cross-site grr
     postp = function (url, vals, callback) {
-      vals['proxy_url'] = url
-      $.post('/proxy', vals, callback, 'json')
+      v = {}
+      v['proxy_url'] = url
+      v['datap'] = Base64.encode(JSON.stringify(vals))
+      $.post('/proxy', v, callback, 'json')
     },
 
     // This helper function will throw a TypeError if the library user is not
@@ -226,6 +228,10 @@
         return gh.blob(this.user, this.repo, sha)
     };
 
+    gh.repo.prototype.ref = function (ref, sha) {
+        return gh.ref(this.user, this.repo, ref, sha)
+    };
+
 
     gh.repo.prototype.branches = withV3Api(function (callback, context) {
         jsonp("repos/" + this.user + "/" + this.repo + "/git/refs/heads", callback, context);
@@ -254,6 +260,12 @@
         return this;
     });
 
+    gh.commit.prototype.write = function (commitHash, callback) {
+      url = "repos/" + this.user + "/" + this.repo + "/git/commits"
+      postp(url, commitHash, callback)
+      return this;
+    };
+
     // ### Trees
 
     gh.tree = function (user, repo, sha) {
@@ -269,6 +281,12 @@
           callback, context);
         return this;
     });
+
+    gh.tree.prototype.write = function (treeHash, callback) {
+      url = "repos/" + this.user + "/" + this.repo + "/git/trees"
+      postp(url, treeHash, callback)
+      return this;
+    };
 
     // ### Blobs
 
@@ -297,6 +315,31 @@
     gh.blob.prototype.decode = function (data) {
       return Base64.decode(data)
     }
+
+    // ### Refs
+
+    gh.ref = function (user, repo, ref, sha) {
+        if ( !(this instanceof gh.ref) )
+            return new gh.ref(user, repo, ref, sha);
+        this.user = user;
+        this.repo = repo;
+        this.ref = ref;
+        this.sha = sha;
+    };
+
+    gh.ref.prototype.show = withV3Api(function (callback, context) {
+      jsonp("repos/" + this.user + "/" + this.repo + "/git/" + this.ref, 
+        callback, context);
+      return this;
+    });
+
+    gh.ref.prototype.update = function (commitSha, callback) {
+      var vals = {'ref': this.ref, 'type': 'commit', 'sha': commitSha}
+      url = "repos/" + this.user + "/" + this.repo + "/git/" + this.ref
+      postp(url, vals, callback)
+      return this;
+    };
+
 
     // ### Pull Requests
 
