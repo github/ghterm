@@ -1,0 +1,24 @@
+.term {
+  font-family: "Courier New",courier,fixed,monospace;
+  font-size: 13px;
+  color: #6f8;
+  background: #000;
+  letter-spacing: 1px;
+}
+.term .termReverse {
+  color: #fff;
+  background: #999;
+}
+#termDiv { 
+  margin:0 auto;
+}
+#editor {
+  background: #fff;
+  display: none;
+}
+#editorDiv {
+  position: relative;
+  width: 700px;
+  height: 500px;
+  background: #fff;
+}

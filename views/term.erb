@@ -1,40 +1,82 @@
-<html>
-<head>
-  <title>GitHub Terminal</title>
-  <script language="JavaScript" type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_min.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_parser_min.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/github.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/terminal.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/ace/ace.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-vim.js"></script>
-  <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-emacs.js"></script>
-  <link rel="stylesheet" type="text/css" media="all" href="css/reset.css" />
-  <link rel="stylesheet" type="text/css" media="all" href="css/text.css" />
-  <link rel="stylesheet" type="text/css" media="all" href="css/960.css" />
-  <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
-</head>
-<body>
-  <div class="container_12">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Terminal.GitHub</title>
+    <link rel="stylesheet" href="/css/term.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/css/style.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/css/documentation.css" type="text/css" media="screen">
+    <script language="JavaScript" type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/termlib/termlib_parser_min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/github.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/terminal.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/ace.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-vim.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-emacs.js"></script>
+  </head>
+
+  <body class="documentation">
     <input id="token" type="hidden" value="<%= @user.token %>">
     <input id="login" type="hidden" value="<%= @user.login %>">
-    <div class="grid_9">
-      <center>
-        <div id="termDiv" class="termopen"></div>
-      </center>
-      <div id="editor">
-        <div id="editorDiv">some text</div>
-        <a href="#" class="button blue" id="editDone">Save and Close</a>
-      </div>
-    </div> 
-    <div class="grid_3">
-      <div id="sidebar">
-        <%= @user.name %> (<%= @user.login %>)<br/>
-        <div id="message"></div>
-        <a href="/logout">logout</a>
+    <div id="not-footer">
+    <div id="header-wrapper">
+      <div id="header">
+        <div>
+          <a class="logo" href="/"><img src="/images/logo.png" /></a>
+          <ul class="nav">
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+      </div><!-- #header -->
+    </div><!-- #header-wrapper -->
 
+    <div id="wrapper">
+
+      <div class="content">
+        <div id="termDiv" class="termopen"></div>
+        <div id="editor">
+          <div id="editorDiv">some text</div>
+          <a href="#" class="button blue" id="editDone">Save and Close</a>
+        </div>
       </div>
-    </div>
-  </div>
-</body>
+
+      <div id="js-help-sidebar" class="sidebar-shell">
+        <div class="sidebar-module">
+          <ul>
+            <li class="js-topic">
+            <h3><a href="#"><%= @user.login %> session</a></h3>
+              <ul>
+                <li><span id="message"></span></li>
+              </ul>
+            </li>
+          </ul>
+        </div> <!-- /sidebar-module -->
+        <div class="sidebar-module">
+          <p>This website is <a href="http://github.com/github/help.github.com#readme" target="_blank">open source</a>. Please help us by forking the project and adding to it.</p>
+        </div>
+      </div><!-- /sidebar-shell -->
+
+    </div><!-- #wrapper -->
+
+  </div><!-- /not-footer -->
+  <div id="footer-wrapper">
+    <div id="footer">
+      <div class="left-col">
+        <h2 class="logo"><a href="http://github.com">Brought to you by GitHub</a></h2>
+        <ul class="github-nav">
+          <li><a href="http://github.com/blog" class="blog">The GitHub Blog</a></li>
+          <li><a href="http://support.github.com">Support</a></li>
+          <li><a href="http://github.com/contact">Contact</a></li>
+          <li><a href="http://developer.github.com">API</a></li>
+        </ul>
+        <p class="copyline">© 2011 GitHub Inc. All rights reserved</p>
+      </div>
+      <div class="right-col">
+        <p class="rackspace">Powered by the <a href="http://rackspace.com" target="_blank">Dedicated Servers</a> and <a href="http://rackspacecloud.com" target="_blank">Cloud Computing</a> of Rackspace Hosting®</p>
+      </div>
+    </div><!-- #footer -->
+  </div><!-- #footer-wrapper -->
+
+  </body>
 </html>

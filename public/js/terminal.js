@@ -355,7 +355,7 @@ function startTerminal() {
   term = new Terminal(
     {
       cols: 80,
-      rows: 30,
+      rows: 27,
       termDiv: 'termDiv',
       initHandler: termInitHandler,
       handler: termHandler
