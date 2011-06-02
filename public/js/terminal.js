@@ -124,10 +124,12 @@ function runCommit() {
     cm.tree = resp.sha
     cm.message = "test message"
     cm.parents = [ghStageCommit]
+    addNewObject('tree', resp)
     term.write(" tree %c(@lightyellow)" + resp.sha + "%n")
     term.write("Committing files...  ")
     var commit = ghRepo.commit()
     commit.write(cm, function(resp) {
+      addNewObject('commit', resp)
       term.write(" commit %c(@lightyellow)" + resp.sha + "%n")
       term.write("Updating branch...")
       var ref = ghRepo.ref(ghBranch.ref, ghBranch.sha)
@@ -416,6 +418,7 @@ function stopEditor() {
   content = editor.getSession().getValue()
   var blob = ghRepo.blob()
   blob.write(content, function(resp) {
+    addNewObject('blob', resp)
     ghStage.push({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha, 'mode': '100644'})
     term.write("File '" + lastEditPath + "' saved %c(@lightyellow)(" + resp['sha'] + ")")
     term.prompt()
@@ -424,6 +427,24 @@ function stopEditor() {
   TermGlobals.keylock = false
   term.open()
   resetPs()
+}
+
+function addNewObject(type, data) {
+  newObjects.push([type, data, ghRepo.user, ghRepo.repo])
+  newObjects = newObjects.slice(0, 10)
+
+  $('#newObjects').empty()
+  $('#newObjects').append("<h3><a href='#'>New Objects</a></h3>")
+  var list = $("<ul>")
+  newObjects.forEach(function(obj) {
+    if(obj[0] == 'commit') {
+      url = "http://github.dev/" + obj[2] + "/" + obj[3] + "/" + obj[0] + "/" + obj[1].sha
+    } else {
+      url = '#'
+    }
+    list.prepend("<li><span><a href='" + url + "'><code>" + obj[1].sha.substring(0, 10) + "</code></a> &nbsp;  " +  obj[0] + "</span></li>")
+  })
+  $('#newObjects').append(list)
 }
 
 // Open the Terminal
@@ -453,6 +474,8 @@ var ghStage = []
 var ghStageCommit = null
 var ghPath = []
 var lastEditPath = ''
+
+var newObjects = []
 
 var currentState = 'top'
 var stateStack = []

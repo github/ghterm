@@ -44,12 +44,13 @@
       <div id="js-help-sidebar" class="sidebar-shell">
         <div class="sidebar-module">
           <ul>
-            <li class="js-topic">
-            <h3><a href="#"><%= @user.login %> session</a></h3>
+            <li id="sessionInfo">
+              <h3><a href="#">Session <%= @user.login %></a></h3>
               <ul>
                 <li><span id="message"></span></li>
               </ul>
             </li>
+            <li id="newObjects"></li>
           </ul>
         </div> <!-- /sidebar-module -->
         <div class="sidebar-module">
