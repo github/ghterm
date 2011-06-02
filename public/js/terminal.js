@@ -22,14 +22,6 @@ var help = [
 
 
 function termInitHandler() {
-  // output a start up screen
-  this.write(
-    [
-      '              ****           github terminal            ****',
-      '%c()%n'
-    ]
-  );
-  // and leave with prompt
   this.prompt();
 }
 
@@ -475,7 +467,7 @@ function stopEditor() {
 }
 
 function addNewObject(type, data) {
-  newObjects.push([type, data, ghRepo.user, ghRepo.repo])
+  newObjects.unshift([type, data, ghRepo.user, ghRepo.repo])
   newObjects = newObjects.slice(0, 10)
 
   $('#newObjects').empty()
@@ -487,7 +479,7 @@ function addNewObject(type, data) {
     } else {
       url = '#'
     }
-    list.prepend("<li><span><a href='" + url + "'><code>" + obj[1].sha.substring(0, 10) + "</code></a> &nbsp;  " +  obj[0] + "</span></li>")
+    list.append("<li><span><a href='" + url + "'><code>" + obj[1].sha.substring(0, 10) + "</code></a> &nbsp;  " +  obj[0] + "</span></li>")
   })
   $('#newObjects').append(list)
 }
