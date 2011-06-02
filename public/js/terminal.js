@@ -50,6 +50,9 @@ function termHandler() {
     runTest()
   } else if (command == 'commit') {
     runCommit()
+  } else if (command == 'unstage') {
+    var path = this.argv[this.argc++];
+    runUnstage(path)
   } else if ((command == 'edit') || (command == 'vim') || (command == 'emacs')) {
     var fileName = this.argv[this.argc++];
     startEditor(fileName, command)
@@ -87,6 +90,21 @@ function runNext() {
 }
 // -- sets up env for feature dev --
 
+
+function runUnstage(path) {
+  if(ghStage.length > 0) {
+    newStage = []
+    ghStage.forEach(function(entry) {
+      if(entry.path != path) {
+        newStage.push(entry)
+      } else {
+        term.write("Removed " + path + '%n')
+      }
+    })
+    ghStage = newStage
+  }
+  nextTerm()
+}
 
 function runStatus() {
   if(ghStage.length > 0) {
@@ -491,7 +509,8 @@ $(function() {
   token = $("#token").attr("value")
   ghLogin = $("#login").attr("value")
 
-  ghUser = gh.user(ghLogin);
+  ghUser = gh.user(ghLogin)
+  gh.authenticate(token)
 
   startTerminal()
 })
