@@ -1,6 +1,3 @@
-* filtering/paging/sorting for repo list
-* more info in repo listing
-
 * improve save and close button / exp
 
 * search / fork projects
