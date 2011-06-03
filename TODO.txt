@@ -1,4 +1,8 @@
-* load data on demand, not 'ls'
+* load data on demand, not 'ls' (branches)
+
+* can create new repos with 'mkdir'
+* can create new files
+* can delete files
 
 * list all pushable repos
 * search / fork projects
