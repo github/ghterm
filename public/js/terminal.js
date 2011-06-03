@@ -477,7 +477,7 @@ function writeRepos(filter) {
 
   var displayEm = []
   ghRepos.forEach(function (repo) {
-    if(repo.name.search(filter) >= 0)
+    if((repo.name.search(filter) >= 0) || (repo.owner.login.search(filter) >= 0))
       displayEm.unshift(repo)
   })
   displayEm.slice(0, displayNum).forEach(function (repo) {
