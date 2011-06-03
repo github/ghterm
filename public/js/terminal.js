@@ -505,7 +505,7 @@ function addNewObject(type, data) {
   var list = $("<ul>")
   newObjects.forEach(function(obj) {
     if(obj[0] == 'commit') {
-      url = "http://github.dev/" + obj[2] + "/" + obj[3] + "/" + obj[0] + "/" + obj[1].sha
+      url = "https://github.com/" + obj[2] + "/" + obj[3] + "/" + obj[0] + "/" + obj[1].sha
     } else {
       url = '#'
     }

@@ -11,8 +11,8 @@
 
     // To save keystrokes when we make JSONP calls to the HTTP API, we will keep
     // track of the root from which all V2 urls extend.
-    apiRoot  = "http://github.dev/api/v2/json/",
-    api3Root = "http://api.github.dev/",
+    apiRoot  = "https://github.com/api/v2/json/",
+    api3Root = "https://api.github.com/",
 
     // Send a JSONP request to the Github API that calls `callback` with
     // the `context` argument as `this`.

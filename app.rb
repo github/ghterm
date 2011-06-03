@@ -14,6 +14,8 @@ class TerminalApp < Sinatra::Base
 
   register Sinatra::Auth::Github
 
+  HOST = 'https://api.github.com'
+
   get '/' do
     if github_user
       redirect '/term'
@@ -37,8 +39,7 @@ class TerminalApp < Sinatra::Base
   end
 
   post '/proxy' do
-    host = 'http://api.github.dev'
-    url = host + '/' + params.delete('proxy_url')
+    url = HOST + '/' + params.delete('proxy_url')
     p = JSON.parse(Base64.decode64(params['datap']))
     p['access_token'] = github_user.token
 
