@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'sinatra_auth_github'
 require 'nestful'
-require 'pp'
 
 class TerminalApp < Sinatra::Base
   enable :sessions
