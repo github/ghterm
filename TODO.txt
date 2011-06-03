@@ -1,28 +1,29 @@
 * filtering/paging/sorting for repo list
+* more info in repo listing
 
 * improve save and close button / exp
-
-* bookmarklet that opens github project in ghterm
-
-* make "edit github/master/file" work
-* "cd /" goes back to the root
-* cd then ls into a file lists out the file content
-* create and switch to another branch
-* poll current branch to see if it changes while editing
-* if current branch changes - commit to another branch
 
 * search / fork projects
 * browse command - open in github
 * branch - create and switch to a branch
 * proper error when you can't update a branch - poll
 * send pull requests
-* test from ipad
 * diff
+
+* make "edit github/master/file" work
+* "cd /" goes back to the root
+* create and switch to another branch
+* poll current branch to see if it changes while editing
+* if current branch changes - commit to another branch
+* bookmarklet that opens github project in ghterm
+* ipad keyboard (?)
 
 * blog post or article on Oauth, Git API, GHTerm
 
 * sidebar context and help
+
 * list files with numbers ($ edit 2)
+* cd then ls into a file lists out the file content
 * advanced log options
 
 * sign-in page text / help

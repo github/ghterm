@@ -5,7 +5,7 @@ var help = [
   '',
   '= Navigating =============================================',
   '',
-  '  ls              %c(@tan)see your context.',
+  '  ls (<filter>)   %c(@tan)see your context.',
   '  cd <dir>        %c(@tan)change your context.',
   '',
   '= Editing and Committing =================================',
@@ -30,6 +30,7 @@ function termHandler() {
   var parser = new Parser();
   parser.parseLine(this);
   var command = this.argv[this.argc++];
+  var message = this.argv.slice(1, this.argv.length).join(' ')
 
   this.newLine()
 
@@ -42,7 +43,7 @@ function termHandler() {
     })
     nextTerm()
   } else if (command == 'ls') {
-    listCurrent()
+    listCurrent(message)
   } else if (command == 'cd') {
     newState = this.argv[this.argc++];
     newState.split("/").forEach(function(dir) {
@@ -55,7 +56,6 @@ function termHandler() {
   } else if (command == 'test') {
     runTest()
   } else if (command == 'commit') {
-    var message = this.argv.slice(1, this.argv.length).join(' ')
     runCommit(message)
   } else if (command == 'unstage') {
     var path = this.argv[this.argc++];
@@ -260,12 +260,12 @@ function runLog(log) {
 }
 
 // write a listing of the current state
-function listCurrent() {
+function listCurrent(filter) {
   if(currentState == 'top') {
     ghUser.allRepos(function (data) {
       ghRepos = data.repositories
       $("#message").text("Number of repos: " + ghRepos.length)
-      writeRepos()
+      writeRepos(filter)
     });
   } else if(currentState == 'repo') {
     ghRepo.branches(function (data) {
@@ -391,18 +391,39 @@ function writeBranches() {
 }
 
 // list repositories
-function writeRepos() {
+function writeRepos(filter) {
   if(!ghRepos)
     return false
+  
+  ghRepos.sort(function(a, b) {
+    if(!a.pushed_at)
+      return -1
+    a = Date.parse(a.pushed_at)
+    b = Date.parse(b.pushed_at)
+    return a - b
+  })
+
   ghRepos.forEach(function (repo) {
-    term.write("%c(@lightblue)" + repo.name)
+    if(repo.name.search(filter) < 0)
+      return
+    if(repo.private) {
+      writePadded("@khaki", repo.name, 40)
+    } else {
+      writePadded("@skyblue", repo.name, 40)
+    }
+    writePadded("@wheat", repo.owner, 10)
+    writePadded("@lightgrey", repo.description, 20)
+    if(repo.pushed_at) {
+      writePadded("@indianred", repo.pushed_at.substring(5, 10), 5)
+    }
     term.newLine()
   })
   nextTerm()
 }
 
-
 function writePadded(color, str, len) {
+  if(!str)
+    str = ''
   if (str.length > len) {
     str = str.substring(0, len - 2) + '..'
   }
