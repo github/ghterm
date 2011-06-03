@@ -206,7 +206,7 @@ function changeState(newState) {
   if(currentState == 'top') { // top level - cd'ing to a repo state
     for(i = 0; i <= ghRepos.length - 1; i++) {
       if(ghRepos[i].name == newState) {
-        ghRepo = gh.repo(ghUser.username, ghRepos[i].name)
+        ghRepo = gh.repo(ghRepos[i].owner.login, ghRepos[i].name)
         pushState('repo', ghRepo.repo)
         return nextTerm()
       }
@@ -433,7 +433,7 @@ function writeRepos(filter) {
     } else {
       writePadded("@skyblue", repo.name, 40)
     }
-    writePadded("@wheat", repo.owner, 10)
+    writePadded("@wheat", repo.owner.login, 10)
     writePadded("@lightgrey", repo.description, 20)
     if(repo.pushed_at) {
       writePadded("@indianred", repo.pushed_at.substring(5, 10), 5)

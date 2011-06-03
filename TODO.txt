@@ -1,18 +1,20 @@
-* improve save and close button / exp
+* load data on demand, not 'ls'
 
+* list all pushable repos
 * search / fork projects
 * branch - create and switch to a branch
-* proper error when you can't update a branch - poll
-* send pull requests
 * diff
 
+* switch repo list to v3
 * make "edit github/master/file" work
 * "cd /" goes back to the root
 * create and switch to another branch
 * poll current branch to see if it changes while editing
 * if current branch changes - commit to another branch
+
 * bookmarklet that opens github project in ghterm
 * ipad keyboard (?)
+* improve save and close button / exp
 
 * blog post or article on Oauth, Git API, GHTerm
 
@@ -25,7 +27,6 @@
 * sign-in page text / help
 * themes for editor / syntax highlighting for files
 
-* load data on demand, not 'ls'
 * use cached trees when listing
 
 * pjax for getting back to a place

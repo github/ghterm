@@ -161,12 +161,16 @@
         }
 
         function pageLoop (data) {
-            if (data.repositories.length == 0) {
+            if (data.data.length == 0) {
                 exitCallback();
             } else {
-                repos = repos.concat(data.repositories);
+                repos = repos.concat(data.data);
                 page += 1;
-                gh.repo.forUser(username, pageLoop, context, page);
+                if (data.data.length < 100) {
+                  exitCallback();
+                } else {
+                  gh.repo.forUser(username, pageLoop, context, page);
+                }
             }
         }
 
@@ -208,13 +212,13 @@
     };
 
     // Get all the repos that are owned by `user`.
-    gh.repo.forUser = function (user, callback, context, page) {
+    gh.repo.forUser = withV3Api(function (user, callback, context, page) {
         if (!page)
           page = 1;
 
-        jsonp("repos/show/" + user + '?page=' + page, callback, context);
+        jsonp("user/repos?page=" + page + '&per_page=' + 100, callback, context);
         return this;
-    };
+    });
 
     gh.repo.prototype.commit = function (sha) {
         return gh.commit(this.user, this.repo, sha)
