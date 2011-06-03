@@ -105,9 +105,23 @@ function checkUser() {
   })
 }
 
+function dedupeStage(path) {
+  if(ghStage.length > 0) {
+    var newStage = []
+    var paths = {}
+    ghStage.forEach(function(entry) {
+      if(!paths[entry.path]) {
+        paths[entry.path] = true
+        newStage.push(entry)
+      }
+    })
+    ghStage = newStage
+  }
+}
+
 function runUnstage(path) {
   if(ghStage.length > 0) {
-    newStage = []
+    var newStage = []
     ghStage.forEach(function(entry) {
       if(entry.path != path) {
         newStage.push(entry)
@@ -195,6 +209,9 @@ function changeState(newState) {
       }
     }
   } else if (currentState == 'repo') {
+    if(!ghBranches) {
+      return nextTerm("%c(@indianred)No context%n")
+    }
     for(i = 0; i <= ghBranches.length - 1; i++) {
       var name = ghBranches[i].ref.replace('refs/heads/', '')
       if(name == newState) {
@@ -274,6 +291,16 @@ function listCurrent() {
     term.write("unknown state")
     nextTerm()
   }
+}
+
+function findStagedSha(path) {
+  for(var i=0; i < ghStage.length; i++) {
+    var entry = ghStage[i]
+    if(entry.path == path) {
+      return entry.sha
+    }
+  }
+  return false
 }
 
 function getCurrentDir() {
@@ -418,8 +445,10 @@ function resetPs(str) {
 }
 
 function startEditor(fileName, type) {
-  if(sha = findTreeSha(fileName, false)) {
-    lastEditPath = treePath() + fileName
+  lastEditPath = treePath() + fileName
+  var sha = findStagedSha(lastEditPath)
+  if(!sha) { sha = findTreeSha(fileName, false) }
+  if(sha) {
     var blob = ghRepo.blob(sha)
     blob.show(function(resp) {
       b = resp.data
@@ -456,7 +485,8 @@ function stopEditor() {
   var blob = ghRepo.blob()
   blob.write(content, function(resp) {
     addNewObject('blob', resp)
-    ghStage.push({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha, 'mode': '100644'})
+    ghStage.unshift({'path': lastEditPath, 'type': 'blob', 'sha': resp.sha, 'mode': '100644'})
+    dedupeStage()
     term.write("File '" + lastEditPath + "' saved %c(@lightyellow)(" + resp['sha'] + ")")
     term.prompt()
   })
@@ -523,6 +553,10 @@ var editor = null
 $(function() {
   $("#editDone").click(function() {
     stopEditor()
+  })
+
+  $("#prompter").click(function() {
+    term.prompt()
   })
 
   token = $("#token").attr("value")
