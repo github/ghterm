@@ -1,7 +1,6 @@
 * improve save and close button / exp
 
 * search / fork projects
-* browse command - open in github
 * branch - create and switch to a branch
 * proper error when you can't update a branch - poll
 * send pull requests

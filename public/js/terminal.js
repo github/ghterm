@@ -7,6 +7,7 @@ var help = [
   '',
   '  ls (<filter>)   %c(@tan)see your context.',
   '  cd <dir>        %c(@tan)change your context.',
+  '  browse          %c(@tan)open the current context in github if possible',
   '',
   '= Editing and Committing =================================',
   '',
@@ -53,6 +54,8 @@ function termHandler() {
     runLog(this.argv)
   } else if (command == 'status') {
     runStatus()
+  } else if (command == 'browse') {
+    runBrowse()
   } else if (command == 'test') {
     runTest()
   } else if (command == 'commit') {
@@ -293,6 +296,25 @@ function listCurrent(filter) {
   }
 }
 
+function runBrowse() {
+  if(currentState == 'top') {
+    window.open(github_url)
+  } else if(currentState == 'repo') {
+    url = github_url + ghRepo.user + '/' + ghRepo.repo
+    window.open(url)
+  } else if(currentState == 'branch') {
+    name = ghBranch.ref.replace('refs/heads/', '')
+    url = github_url + ghRepo.user + '/' + ghRepo.repo + '/tree/' + name
+    window.open(url)
+  } else if(currentState == 'path') {
+    url = github_url + ghRepo.user + '/' + ghRepo.repo + '/tree/' + name + currentPath()
+    window.open(url)
+  } else {
+    term.write("unknown state")
+  }
+  nextTerm()
+}
+
 function findStagedSha(path) {
   for(var i=0; i < ghStage.length; i++) {
     var entry = ghStage[i]
@@ -526,7 +548,7 @@ function addNewObject(type, data) {
   var list = $("<ul>")
   newObjects.forEach(function(obj) {
     if(obj[0] == 'commit') {
-      url = "https://github.com/" + obj[2] + "/" + obj[3] + "/" + obj[0] + "/" + obj[1].sha
+      url = github_url + obj[2] + "/" + obj[3] + "/" + obj[0] + "/" + obj[1].sha
     } else {
       url = '#'
     }
@@ -570,6 +592,7 @@ var stateStack = []
 var lastPs = null
 
 var editor = null
+var github_url = "https://github.com/"
 
 $(function() {
   $("#editDone").click(function() {
