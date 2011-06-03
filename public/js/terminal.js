@@ -46,10 +46,7 @@ function termHandler() {
   } else if (command == 'ls') {
     listCurrent(message)
   } else if (command == 'cd') {
-    newState = this.argv[this.argc++];
-    newState.split("/").forEach(function(dir) {
-      changeState(dir)
-    })
+    changeState(message)
   } else if (command == 'log') {
     runLog(this.argv)
   } else if (command == 'status') {
@@ -196,6 +193,22 @@ function runCommit(message) {
 }
 
 function changeState(newState) {
+  console.log(newState)
+  if (newState.search('/') >= 0) {
+    console.log("found it")
+    if(currentState == 'top') { 
+      // do i really need to authenticate this? no.
+      userRepo = newState.split('/')
+      ghRepo = gh.repo(userRepo[0], userRepo[1])
+      pushState('repo', userRepo)
+      return nextTerm()
+    }
+
+    newState.split("/").forEach(function(dir) {
+      changeState(dir)
+    })
+    return false
+  }
   if (newState == '..') {
     if(currentState == 'path') {
       ghPath.pop()
@@ -265,23 +278,43 @@ function runLog(log) {
   }
 }
 
+function sortRepos() {
+  ghRepos.sort(function(a, b) {
+    if(!a.pushed_at)
+      return -1
+    a = Date.parse(a.pushed_at)
+    b = Date.parse(b.pushed_at)
+    return a - b
+  })
+  if(ghRepos.length > 0) {
+    var newRepos = []
+    var paths = {}
+    ghRepos.forEach(function(entry) {
+      if(!paths[entry.url]) {
+        paths[entry.url] = true
+        newRepos.push(entry)
+      }
+    })
+    ghRepos = newRepos
+  }
+  $("#message").text("Number of repos: " + ghRepos.length)
+}
+
 function loadRepos(callback) {
   if(ghRepos)
     return callback.call()
-  term.write("Loading... %n")
+
   ghUser.allRepos(function (data) {
     ghRepos = data.repositories
-
-    console.log("sorting")
-    ghRepos.sort(function(a, b) {
-      if(!a.pushed_at)
-        return -1
-      a = Date.parse(a.pushed_at)
-      b = Date.parse(b.pushed_at)
-      return a - b
+    ghUser.orgs(function(orgs) {
+      orgs.data.forEach(function(org) {
+        ghUser.orgRepos(org.login, function(resp)  {
+          ghRepos = ghRepos.concat(resp.data)
+          sortRepos()
+        })
+      })
     })
 
-    $("#message").text("Number of repos: " + ghRepos.length)
     if(callback)
       callback.call()
   });
@@ -632,6 +665,7 @@ $(function() {
   ghUser = gh.user(ghLogin)
   gh.authenticate(token)
 
+  loadRepos()
   checkUser()
   startTerminal()
 })

@@ -134,6 +134,16 @@
         return this;
     });
 
+    gh.user.prototype.orgs = withV3Api(function (callback, context) {
+        jsonp("user/orgs", callback, context);
+        return this;
+    });
+
+    gh.user.prototype.orgRepos = withV3Api(function (org, callback, context) {
+        jsonp("orgs/" + org + "/repos", callback, context);
+        return this;
+    });
+
     // Get a list of this user's repositories, 30 per page
     //
     //     gh.user("fitzgen").repos(function (data) {

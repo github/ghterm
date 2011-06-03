@@ -4,11 +4,12 @@
 * can create new files
 * can delete files
 
-* list all pushable repos
+* add orgs
 * search / fork projects
 * branch - create and switch to a branch
 * diff
 
+* add breadcrumbs somewheres - i'm getting lost
 * make "edit github/master/file" work
 * "cd /" goes back to the root
 * create and switch to another branch
