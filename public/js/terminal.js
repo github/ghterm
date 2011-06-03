@@ -204,13 +204,16 @@ function changeState(newState) {
     return nextTerm()
   }
   if(currentState == 'top') { // top level - cd'ing to a repo state
-    for(i = 0; i <= ghRepos.length - 1; i++) {
-      if(ghRepos[i].name == newState) {
-        ghRepo = gh.repo(ghRepos[i].owner.login, ghRepos[i].name)
-        pushState('repo', ghRepo.repo)
-        return nextTerm()
+    loadRepos(function() {
+      for(i = 0; i <= ghRepos.length - 1; i++) {
+        if(ghRepos[i].name == newState) {
+          ghRepo = gh.repo(ghRepos[i].owner.login, ghRepos[i].name)
+          pushState('repo', ghRepo.repo)
+          return nextTerm()
+        }
       }
-    }
+    })
+    return true
   } else if (currentState == 'repo') {
     if(!ghBranches) {
       return nextTerm("%c(@indianred)No context%n")
@@ -262,14 +265,34 @@ function runLog(log) {
   }
 }
 
+function loadRepos(callback) {
+  if(ghRepos)
+    return callback.call()
+  term.write("Loading... %n")
+  ghUser.allRepos(function (data) {
+    ghRepos = data.repositories
+
+    console.log("sorting")
+    ghRepos.sort(function(a, b) {
+      if(!a.pushed_at)
+        return -1
+      a = Date.parse(a.pushed_at)
+      b = Date.parse(b.pushed_at)
+      return a - b
+    })
+
+    $("#message").text("Number of repos: " + ghRepos.length)
+    if(callback)
+      callback.call()
+  });
+}
+
 // write a listing of the current state
 function listCurrent(filter) {
   if(currentState == 'top') {
-    ghUser.allRepos(function (data) {
-      ghRepos = data.repositories
-      $("#message").text("Number of repos: " + ghRepos.length)
+    loadRepos(function() {
       writeRepos(filter)
-    });
+    })
   } else if(currentState == 'repo') {
     ghRepo.branches(function (data) {
       ghBranches = data.data
@@ -416,18 +439,15 @@ function writeBranches() {
 function writeRepos(filter) {
   if(!ghRepos)
     return false
-  
-  ghRepos.sort(function(a, b) {
-    if(!a.pushed_at)
-      return -1
-    a = Date.parse(a.pushed_at)
-    b = Date.parse(b.pushed_at)
-    return a - b
-  })
 
+  displayNum = 23
+
+  var displayEm = []
   ghRepos.forEach(function (repo) {
-    if(repo.name.search(filter) < 0)
-      return
+    if(repo.name.search(filter) >= 0)
+      displayEm.unshift(repo)
+  })
+  displayEm.slice(0, displayNum).forEach(function (repo) {
     if(repo.private) {
       writePadded("@khaki", repo.name, 40)
     } else {
@@ -440,6 +460,9 @@ function writeRepos(filter) {
     }
     term.newLine()
   })
+  if(displayEm.length > displayNum) {
+    term.write("and " +  (displayEm.length - displayNum) + " more...%n")
+  }
   nextTerm()
 }
 

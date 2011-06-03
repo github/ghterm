@@ -5,7 +5,6 @@
 * branch - create and switch to a branch
 * diff
 
-* switch repo list to v3
 * make "edit github/master/file" work
 * "cd /" goes back to the root
 * create and switch to another branch
