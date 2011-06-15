@@ -4,7 +4,6 @@
 * can create new files
 * can delete files
 
-* add orgs
 * search / fork projects
 * branch - create and switch to a branch
 * diff
@@ -20,15 +19,12 @@
 * ipad keyboard (?)
 * improve save and close button / exp
 
-* blog post or article on Oauth, Git API, GHTerm
-
-* sidebar context and help
+* more sidebar context and help
 
 * list files with numbers ($ edit 2)
-* cd then ls into a file lists out the file content
+* cd into a file then ls/cat lists out the file content
 * advanced log options
 
-* sign-in page text / help
 * themes for editor / syntax highlighting for files
 
 * use cached trees when listing
