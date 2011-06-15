@@ -659,6 +659,14 @@ $(function() {
     term.prompt()
   })
 
+  $("#helper").click(function() {
+    term.clear()
+    help.forEach(function(line) {
+      term.write(line + '%n')
+    })
+    term.prompt()
+  })
+
   token = $("#token").attr("value")
   ghLogin = $("#login").attr("value")
 

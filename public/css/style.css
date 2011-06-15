@@ -2,6 +2,39 @@ html {
   height: 100%;
 }
 
+.index-content { 
+  width: 500px; 
+  padding: 5px; 
+  margin: 0 auto; 
+}
+
+.index-content ul,
+.index-content ol {
+  margin-left: 1.5em;
+}
+
+.index-content ul {
+  list-style-type: disc;
+}
+
+.index-content ul code,
+p code {
+  font: 12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+  color: #52595d;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  padding: 0px 3px;
+  display: inline-block;
+}
+
+
+
 /* Remove Below */
 
 #header .logo img {
