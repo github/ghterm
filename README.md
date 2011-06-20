@@ -1,6 +1,8 @@
 # GitHub Terminal
 
-This is an example application written to demonstrate what is possible with the new GitHub Git Data API and GitHub OAuth2 services. This app allows you to login as your GitHub user and edit and commit groups of files through a virtual terminal.  With this you could contribute meaningfully to a project using just Javascript in the browser - no Git or editor needs to be installed locally.
+This is an example application written to demonstrate what is possible with the new GitHub [Git Data API][api] and GitHub OAuth2 services. This app allows you to login as your GitHub user and edit and commit groups of files through a virtual terminal.  With this you could contribute meaningfully to a project using just Javascript in the browser - no Git or editor needs to be installed locally.
+
+[api]: http://developer.github.com/v3/git/
 
 # Features
 
@@ -27,6 +29,7 @@ You can `cd` into a project and a branch, then an `ls` will show you the project
 
 * Ace JS Editor (http://ace.ajax.org/)
 * Termlib (http://www.masswerk.at/termlib/)
+* GitHub-API JS Library (https://github.com/fitzgen/github-api) (hacked to death)
 
 # Contributing
 
