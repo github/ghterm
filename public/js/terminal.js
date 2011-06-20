@@ -161,9 +161,9 @@ function runCommit(message) {
     return nextTerm("Please provide a commit message%n")
   }
 
-  term.write("Base Tree:                   %c(@khaki)" + ghCommit.cache.tree + '%n')
+  term.write("Base Tree:                   %c(@khaki)" + ghCommit.cache.commit.tree.sha + '%n')
   tr = {}
-  tr.base_tree = ghCommit.cache.tree
+  tr.base_tree = ghCommit.cache.commit.tree.sha
   tr.tree = ghStage
   term.write("Writing the new tree...")
   var tree = ghRepo.tree()
@@ -180,13 +180,13 @@ function runCommit(message) {
       addNewObject('commit', resp)
       term.write(" commit %c(@lightyellow)" + resp.sha + "%n")
       term.write("Updating branch...")
-      var ref = ghRepo.ref(ghBranch.ref, ghBranch.sha)
+      var ref = ghRepo.ref(ghBranch.ref, ghBranch.object.sha)
       ref.update(resp.sha, function(resp) {
         nextTerm("           %c(@lightblue)Branch Updated")
-        ghBranch.sha = resp.sha
+        ghBranch.object.sha = resp.object.sha
         ghStage = []
-        ghStageCommit = resp.sha
-        ghCommit = ghRepo.commit(ghBranch.sha)
+        ghStageCommit = resp.object.sha
+        ghCommit = ghRepo.commit(ghBranch.object.sha)
       })
     })
   })
@@ -235,9 +235,9 @@ function changeState(newState) {
       var name = ghBranches[i].ref.replace('refs/heads/', '')
       if(name == newState) {
         ghBranch = ghBranches[i]
-        if(ghBranch.sha != ghStageCommit) {
+        if(ghBranch.object.sha != ghStageCommit) {
           term.write("%c(@indianred)New Stage%n")
-          ghStageCommit = ghBranch.sha
+          ghStageCommit = ghBranch.object.sha
           ghStage = []
         }
         pushState('branch', name)
@@ -246,7 +246,7 @@ function changeState(newState) {
     }
   } else if ((currentState == 'branch') || (currentState == 'path')) {
     var subtree = getCurrentSubtree(false)
-    for(i = 0; i <= subtree.count - 1; i++) {
+    for(i = 0; i <= subtree.tree.length - 1; i++) {
       var name = subtree.tree[i].path;
       if(name == newState) {
         ghPath.push(name)
@@ -261,14 +261,14 @@ function changeState(newState) {
 function runLog(log) {
   if(currentState == 'branch' || currentState == 'path') {
     // show commits
-    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.sha)
+    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.object.sha)
     ghCommit.list(function(resp) {
       commits = resp.data
       commits.forEach(function(commit) {
         writePadded("@green",  commit.sha.substring(0, 8), 8)
-        writePadded("@cornflowerblue",   commit.author.date.substring(5, 10), 5)
-        writePadded("@lightblue",   commit.author.email, 10)
-        writePadded("@wheat", commit.message.split("\n").pop(), 50)
+        writePadded("@cornflowerblue",   commit.commit.author.date.substring(5, 10), 5)
+        writePadded("@lightblue",   commit.commit.author.email, 10)
+        writePadded("@wheat", commit.commit.message.split("\n").shift(), 50)
         term.newLine()
       })
       nextTerm()
@@ -333,13 +333,13 @@ function listCurrent(filter) {
       writeBranches()
     })
   } else if(currentState == 'branch') {
-    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.sha)
+    ghCommit = gh.commit(ghRepo.user, ghRepo.repo, ghBranch.object.sha)
     ghCommit.show(function(resp) {
       data = resp.data
       ghCommit.cache = data
       showCommit()
       ghCommit.subTree = {}
-      showTree(data.tree, '/')
+      showTree(data.commit.tree.sha, '/')
     })
   } else if(currentState == 'path') {
     // use data from ghPath to get a tree sha from treecache
@@ -388,7 +388,7 @@ function getCurrentDir() {
 
 function findTreeSha(path, pop) {
   var subtree = getCurrentSubtree(pop)
-  for(i = 0; i <= subtree.count - 1; i++) {
+  for(i = 0; i <= subtree.tree.length - 1; i++) {
     var tree = subtree.tree[i]
     if(tree.path == path) {
       return tree.sha
@@ -419,9 +419,9 @@ function treePath() {
 function showCommit() {
   data = ghCommit.cache
   term.write("commit : %c(@lightyellow)" + data.sha + '%n')
-  term.write("tree   : %c(@lightyellow)" + data.tree + '%n')
-  term.write("author : " + data.author.name + '%n')
-  term.write("date   : %c(@indianred)" + data.author.date + '%n')
+  term.write("tree   : %c(@lightyellow)" + data.commit.tree.sha + '%n')
+  term.write("author : " + data.commit.author.name + '%n')
+  term.write("date   : %c(@indianred)" + data.commit.author.date + '%n')
   term.write("path   : " + currentPath() + '%n')
   term.write('%n')
 }

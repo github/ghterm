@@ -263,13 +263,13 @@
     };
 
     gh.commit.prototype.show = withV3Api(function (callback, context) {
-        jsonp("repos/" + this.user + "/" + this.repo + "/git/commits/" + this.sha, 
+        jsonp("repos/" + this.user + "/" + this.repo + "/commits/" + this.sha, 
           callback, context);
         return this;
     });
 
     gh.commit.prototype.list = withV3Api(function (callback, context) {
-        jsonp("repos/" + this.user + "/" + this.repo + "/git/commits?start=" + this.sha, 
+        jsonp("repos/" + this.user + "/" + this.repo + "/commits?sha=" + this.sha, 
           callback, context);
         return this;
     });
