@@ -100,6 +100,7 @@ function runNext() {
 var pollTimer = 30000
 function checkUser() {
   ghUser.show(function(resp) {
+    $('#ratelimit').text("API Limit: " + resp.meta["X-RateLimit-Remaining"] + ' / ' + resp.meta["X-RateLimit-Limit"])
     $('#avatar').html("<img src='" + resp.data.avatar_url + "'>")
     setTimeout("checkUser()", pollTimer)
   })
@@ -193,9 +194,7 @@ function runCommit(message) {
 }
 
 function changeState(newState) {
-  console.log(newState)
   if (newState.search('/') >= 0) {
-    console.log("found it")
     if(currentState == 'top') { 
       // do i really need to authenticate this? no.
       userRepo = newState.split('/')
