@@ -32,7 +32,7 @@ class TerminalApp < Sinatra::Base
     end
   end
 
-  get '/auth' do
+  get '/authenticate' do
     authenticate!
     redirect '/term'
   end
