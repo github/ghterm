@@ -542,6 +542,33 @@ function resetPs(str) {
   term.ps = lastPs
 }
 
+function syntaxHighlight(fileName, editor) {
+  var mode = "text";
+  if (/^.*\.js$/i.test(fileName)) {
+    mode = "javascript";
+  } else if (/^.*\.xml$/i.test(fileName)) {
+    mode = "xml";
+  } else if (/^.*\.html$/i.test(fileName)) {
+    mode = "html";
+  } else if (/^.*\.css$/i.test(fileName)) {
+    mode = "css";
+  } else if (/^.*\.py$/i.test(fileName)) {
+    mode = "python";
+  } else if (/^.*\.php$/i.test(fileName)) {
+    mode = "php";
+  } else if (/^.*\.java$/i.test(fileName)) {
+    mode = "java";
+  } else if (/^.*\.rb$/i.test(fileName)) {
+    mode = "ruby";
+  } else if (/^.*\.(c|cpp|h|hpp|cxx)$/i.test(fileName)) {
+    mode = "c_cpp";
+  } else if (/^.*\.coffee$/i.test(fileName)) {
+    mode = "coffee";
+  }
+  eval("var highlighterMode = require(\"ace/mode/" + mode  + "\").Mode;")
+  editor.getSession().setMode(new highlighterMode())
+}
+
 function startEditor(fileName, type) {
   lastEditPath = treePath() + fileName
   var sha = findStagedSha(lastEditPath)
@@ -558,6 +585,7 @@ function startEditor(fileName, type) {
         $("#editor").show()
         editor = ace.edit("editorDiv")
         editor.getSession().setValue(content)
+        syntaxHighlight(fileName, editor)
         editor.gotoLine(1)
         if(type == 'vim') {
           vim = require("ace/keyboard/keybinding/vim").Vim;
