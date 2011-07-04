@@ -567,6 +567,7 @@ function syntaxHighlight(fileName, editor) {
   }
   eval("var highlighterMode = require(\"ace/mode/" + mode  + "\").Mode;")
   editor.getSession().setMode(new highlighterMode())
+  $("#message").text("Syntax: " + mode)
 }
 
 function startEditor(fileName, type) {
@@ -606,6 +607,7 @@ function startEditor(fileName, type) {
 function stopEditor() {
   $("#editor").hide()
   $("#termDiv").show()
+  $("#message").text("Number of branches: " + ghBranches.length)
 
   content = editor.getSession().getValue()
   var blob = ghRepo.blob()
