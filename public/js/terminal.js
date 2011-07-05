@@ -558,8 +558,7 @@ function startEditor(fileName, type) {
         $("#editor").show()
         editor = ace.edit("editorDiv")
         editor.getSession().setValue(content)
-        eval("theme = require(\"ace/theme/" + $('#theme')[0].value + "\");")
-        editor.setTheme(theme)
+        changeTheme()
         editor.gotoLine(1)
         if(type == 'vim') {
           vim = require("ace/keyboard/keybinding/vim").Vim;
@@ -594,6 +593,13 @@ function stopEditor() {
   TermGlobals.keylock = false
   term.open()
   resetPs()
+}
+
+function changeTheme() {
+  if(editor) {
+    eval("theme = require(\"ace/theme/" + $('#theme')[0].value + "\");")
+    editor.setTheme(theme)
+  }
 }
 
 function addNewObject(type, data) {
