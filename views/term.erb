@@ -14,6 +14,17 @@
     <script language="JavaScript" type="text/javascript" src="js/ace/ace.js"></script>
     <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-vim.js"></script>
     <script language="JavaScript" type="text/javascript" src="js/ace/keybinding-emacs.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-clouds.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-clouds_midnight.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-cobalt.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-dawn.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-eclipse.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-idle_fingers.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-kr_theme.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-mono_industrial.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-monokai.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-pastel_on_dark.js"></script>
+    <script language="JavaScript" type="text/javascript" src="js/ace/theme-twilight.js"></script>
   </head>
 
   <body class="documentation">
@@ -50,6 +61,18 @@
                 <li><span id="avatar"></span></li>
                 <li><span id="message"></span></li>
                 <li><span id="ratelimit"></span></li>
+                <li><span><select id="theme" onchange="changeTheme()">
+                  <option value="clouds" selected="selected">Clouds</option>
+                  <option value="clouds_midnight">Clouds (Midnight)</option>
+                  <option value="cobalt">Cobalt</option>
+                  <option value="dawn">Dawn</option>
+                  <option value="eclipse">Eclipse</option>
+                  <option value="idle_fingers">Idle Fingers</option>
+                  <option value="kr_theme">KR Theme</option>
+                  <option value="mono_industrial">Mono Industiral</option>
+                  <option value="pastel_on_dark">Pastel on dark</option>
+                  <option value="twilight">Twilight</option>
+                </select></span></li>
                 <li><span><a href="#" id="prompter">Force Prompt</a></span></li>
                 <li><span><a href="#" id="helper">Help</a></span></li>
               </ul>
