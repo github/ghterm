@@ -4,7 +4,7 @@ Bundler.setup
 
 Bundler.require(:runtime)
 
-require 'app'
+require './app'
 
 use Rack::Static, :urls => ["/css", "/images", "/js"], :root => "public"
 
