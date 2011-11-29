@@ -559,13 +559,9 @@ function startEditor(fileName, type) {
         editor = ace.edit("editorDiv")
         editor.getSession().setValue(content)
         editor.gotoLine(1)
-        if(type == 'vim') {
-          vim = require("ace/keyboard/keybinding/vim").Vim;
-          editor.setKeyboardHandler(vim)
-        }
-        if(type == 'emacs') {
-          emacs = require("ace/keyboard/keybinding/emacs").Emacs;
-          editor.setKeyboardHandler(emacs)
+        if(type != 'edit') {
+          eval(type + " = require(\"ace/keyboard/keybinding/" + type + "\")." + type.charAt(0).toUpperCase() + type.slice(1) + ";")
+          eval("editor.setKeyboardHandler(" + type + ")")
         }
       }
       nextTerm()
