@@ -1,3 +1,5 @@
+**NOTE: This repository is no longer supported or updated by GitHub. If you wish to continue to develop this code yourself, we recommend you fork it.**
+
 # GitHub Terminal
 
 This is an example application written to demonstrate what is possible with the new GitHub [Git Data API][api] and GitHub OAuth2 services. This app allows you to login as your GitHub user and edit and commit groups of files through a virtual terminal.  With this you could contribute meaningfully to a project using just Javascript in the browser - no Git or editor needs to be installed locally.
